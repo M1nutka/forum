@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: forum
+  datasource:
+    url: jdbc:postgresql://localhost:5432/your_database
+    username: postgres
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  
