@@ -17,8 +17,12 @@ public class UserRepository {
 
 
     public List<User> getAllUser(){
+        String sql = """
+                "SELECT id, username, email, name, lastname, born_is, phone, is_active, description
+                FROM users"
+                """;
         List<User> users  = jdbcTemplate.query(
-            "SELECT * FROM users", 
+            sql, 
             (rs, rowNum) -> {
             User user = new User();
             user.setId(rs.getInt("id"));
@@ -36,5 +40,34 @@ public class UserRepository {
             return user;
         });
         return users;
+    }
+
+    public User getUserById(int id){
+        String sql = """
+                "SELECT id, username, email, name, lastname, born_is, phone, is_active, description
+                FROM users
+                WHERE id = ?", 
+                """;
+        User current_user  = jdbcTemplate.queryForObject(
+            sql,
+            (rs, rowNum) -> {
+            User user = new User();
+            user.setId(rs.getInt("id"));
+            user.setUsername(rs.getString("username"));
+            user.setEmail(rs.getString("email"));
+            user.setName(rs.getString("name"));
+            user.setLastname(rs.getString("lastname"));
+
+            Date date = (rs.getDate("born_is"));
+            user.setBornIs(date.toLocalDate());
+
+            user.setPhone(rs.getString("phone"));
+            user.setIsActive(rs.getBoolean("is_active"));
+            user.setDescription(rs.getString("description"));
+            return user;
+        },
+        id
+    );
+        return current_user;
     }
 }
