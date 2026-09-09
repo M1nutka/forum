@@ -36,8 +36,10 @@ public class UserRepository {
 
     public List<User> getAllUser(){
         String sql = """
-                "SELECT id, username, email, name, lastname, born_is, phone, is_active, description
-                FROM users"
+                "SELECT u.id, u.username, u.email, u.name, u.lastname, u.born_is, u.phone, u.is_active, u.description, r.role
+                FROM users u
+                JOIN userroles ur ON u.id = ur.user_id
+                JOIN roles r ON ur.role_id = r.id"
                 """;
         List<User> users  = jdbcTemplate.query(
             sql, 
@@ -55,6 +57,7 @@ public class UserRepository {
             user.setPhone(rs.getString("phone"));
             user.setIsActive(rs.getBoolean("is_active"));
             user.setDescription(rs.getString("description"));
+            user.setUserRole(UserRole.valueOf(rs.getString("role")));
             return user;
         });
         return users;
@@ -62,9 +65,11 @@ public class UserRepository {
 
     public User getUserById(int id){
         String sql = """
-                "SELECT id, username, email, name, lastname, born_is, phone, is_active, description
-                FROM users
-                WHERE id = ?", 
+                "SELECT u.id, u.username, u.email, u.name, u.lastname, u.born_is, u.phone, u.is_active, u.description, r.role
+                FROM users u
+                JOIN userroles ur ON u.id = ur.user_id
+                JOIN roles r ON ur.role_id = r.id
+                WHERE u.id = ?", 
                 """;
         User current_user  = jdbcTemplate.queryForObject(
             sql,
@@ -82,6 +87,7 @@ public class UserRepository {
             user.setPhone(rs.getString("phone"));
             user.setIsActive(rs.getBoolean("is_active"));
             user.setDescription(rs.getString("description"));
+            user.setUserRole(UserRole.valueOf(rs.getString("role")));
             return user;
         },
         id
@@ -120,7 +126,6 @@ public class UserRepository {
 
 
     public User registerUser(UserCreateDTO userCreateDTO) {
-        System.out.println("Rep");
         String hashPassword = passwordEncoder.encode(userCreateDTO.getPassword());
         userCreateDTO.setPassword(hashPassword);
         String sql = """
@@ -153,8 +158,7 @@ public class UserRepository {
                     INSERT INTO userroles (user_id, role_id)
                     VALUES (?, 1)
                 """;
-        jdbcTemplate.update(sqlRole, id
-        );
+        jdbcTemplate.update(sqlRole, id);
 
 
         return new User(
