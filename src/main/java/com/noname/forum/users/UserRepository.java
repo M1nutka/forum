@@ -36,10 +36,10 @@ public class UserRepository {
 
     public List<User> getAllUser(){
         String sql = """
-                "SELECT u.id, u.username, u.email, u.name, u.lastname, u.born_is, u.phone, u.is_active, u.description, r.role
+                SELECT u.id, u.username, u.email, u.name, u.lastname, u.born_is, u.phone, u.is_active, u.description, r.role
                 FROM users u
                 JOIN userroles ur ON u.id = ur.user_id
-                JOIN roles r ON ur.role_id = r.id"
+                JOIN roles r ON ur.role_id = r.id
                 """;
         List<User> users  = jdbcTemplate.query(
             sql, 
@@ -65,11 +65,11 @@ public class UserRepository {
 
     public User getUserById(int id){
         String sql = """
-                "SELECT u.id, u.username, u.email, u.name, u.lastname, u.born_is, u.phone, u.is_active, u.description, r.role
+                SELECT u.id, u.username, u.email, u.name, u.lastname, u.born_is, u.phone, u.is_active, u.description, r.role
                 FROM users u
                 JOIN userroles ur ON u.id = ur.user_id
                 JOIN roles r ON ur.role_id = r.id
-                WHERE u.id = ?", 
+                WHERE u.id = ?
                 """;
         User current_user  = jdbcTemplate.queryForObject(
             sql,
@@ -97,9 +97,11 @@ public class UserRepository {
 
     public User getUserByEmail(String email){
         String sql = """
-                "SELECT id, username, email, name, lastname, born_is, phone, is_active, description
-                FROM users
-                WHERE email = ?", 
+                SELECT u.id, u.username, u.email, u.name, u.lastname, u.born_is, u.phone, u.password, u.is_active, u.description, r.role
+                FROM users u
+                JOIN userroles ur ON u.id = ur.user_id
+                JOIN roles r ON ur.role_id = r.id
+                WHERE u.email = ?
                 """;
         User current_user  = jdbcTemplate.queryForObject(
             sql,
@@ -115,8 +117,10 @@ public class UserRepository {
             user.setBornIs(date.toLocalDate());
 
             user.setPhone(rs.getString("phone"));
+            user.setPassword(rs.getString("password"));
             user.setIsActive(rs.getBoolean("is_active"));
             user.setDescription(rs.getString("description"));
+            user.setUserRole(UserRole.valueOf(rs.getString("role")));
             return user;
         },
         email
@@ -126,8 +130,6 @@ public class UserRepository {
 
 
     public User registerUser(UserCreateDTO userCreateDTO) {
-        String hashPassword = passwordEncoder.encode(userCreateDTO.getPassword());
-        userCreateDTO.setPassword(hashPassword);
         String sql = """
                 INSERT INTO users(username, email, name, lastname, born_is, phone, password, is_active, description)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -151,7 +153,6 @@ public class UserRepository {
             return ps;
         }, keyHolder);
 
-        log.info("" + keyHolder);
         int id = keyHolder.getKey().intValue();
             
         String sqlRole = """
@@ -169,10 +170,52 @@ public class UserRepository {
             userCreateDTO.getLastname(),
             userCreateDTO.getBornIs(),
             userCreateDTO.getPhone(),
-            null,
+            userCreateDTO.getPassword(),
             true,
             userCreateDTO.getDescription(),
             UserRole.USER
         );
+    }
+
+    public User updateUser(int id, UserUpdateDTO updateDTO){
+        String sql = """
+                UPDATE users
+                SET username = ?, name = ?, email = ?, lastname = ?, born_is = ?, phone = ?, description = ?
+                WHERE id = ?
+                """;
+
+        jdbcTemplate.update(
+            sql,
+            updateDTO.getUsername(),
+            updateDTO.getName(),
+            updateDTO.getEmail(),
+            updateDTO.getLastname(),
+            updateDTO.getBornIs(),
+            updateDTO.getPhone(),
+            updateDTO.getDescription(),
+            id
+        );
+
+        return new User(
+            id,
+            updateDTO.getUsername(),
+            updateDTO.getEmail(),
+            updateDTO.getName(),
+            updateDTO.getLastname(),
+            updateDTO.getBornIs(),
+            updateDTO.getPhone(),
+            null,
+            true,
+            updateDTO.getDescription(),
+            null
+        );
+    }
+
+    public void deleteUser(int id){
+        String sql = """
+                    DELETE FROM users
+                    WHERE id = ?
+                """;
+        jdbcTemplate.update(sql, id);
     }
 }
