@@ -3,7 +3,8 @@ package com.noname.forum.users;
 
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -29,11 +30,13 @@ public class User implements UserDetails {
     private String password;
     private Boolean isActive;
     private String description;
-    private UserRole userRole;
+    private Set<UserRole> userRole;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-       return List.of(new SimpleGrantedAuthority("ROLE_" + userRole.name()));
+       return userRole.stream()
+            .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
+            .collect(Collectors.toList());
     }
 
     @Override

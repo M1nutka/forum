@@ -5,8 +5,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-import com.noname.forum.users.Response;
-
 @Service 
 public class AuthService {
     private final AuthenticationManager authenticationManager;
@@ -16,9 +14,9 @@ public class AuthService {
     }
 
       
-    public Authentication loginUser(Response response){
+    public Authentication loginUser(JwtRequest response){
         return authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(response.email(), response.password())
+            new UsernamePasswordAuthenticationToken(response.getLogin(), response.getPassword())
         );
     }
 

@@ -2,7 +2,6 @@ package com.noname.forum.security;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.noname.forum.users.Response;
 import com.noname.forum.users.User;
 import com.noname.forum.users.UserCreateDTO;
 
@@ -39,7 +38,7 @@ public class SecurityController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<?> postMethodName(@RequestBody Response response) {
+    public ResponseEntity<?> postMethodName(@RequestBody JwtRequest response) {
         
         try {
             Authentication auth = authService.loginUser(response);
@@ -51,13 +50,13 @@ public class SecurityController {
             ));
             
         } catch (BadCredentialsException e) {
-            log.warn("Login failed - bad credentials for: {}", response.email());
+            log.warn("Login failed - bad credentials for: {}", response.getLogin());
             return ResponseEntity.status(401).body(Map.of(
                 "error", "Invalid email or password"
             ));
             
         } catch (UsernameNotFoundException e) {
-            log.warn("Login failed - user not found: {}", response.email());
+            log.warn("Login failed - user not found: {}", response.getLogin());
             return ResponseEntity.status(401).body(Map.of(
                 "error", "User not found"
             ));

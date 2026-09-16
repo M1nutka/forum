@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +58,7 @@ public class UserRepository {
             user.setPhone(rs.getString("phone"));
             user.setIsActive(rs.getBoolean("is_active"));
             user.setDescription(rs.getString("description"));
-            user.setUserRole(UserRole.valueOf(rs.getString("role")));
+            user.setUserRole(Set.of(UserRole.valueOf(rs.getString("role"))));
             return user;
         });
         return users;
@@ -87,7 +88,7 @@ public class UserRepository {
             user.setPhone(rs.getString("phone"));
             user.setIsActive(rs.getBoolean("is_active"));
             user.setDescription(rs.getString("description"));
-            user.setUserRole(UserRole.valueOf(rs.getString("role")));
+            user.setUserRole(Set.of(UserRole.valueOf(rs.getString("role"))));
             return user;
         },
         id
@@ -120,7 +121,7 @@ public class UserRepository {
             user.setPassword(rs.getString("password"));
             user.setIsActive(rs.getBoolean("is_active"));
             user.setDescription(rs.getString("description"));
-            user.setUserRole(UserRole.valueOf(rs.getString("role")));
+            user.setUserRole(Set.of(UserRole.valueOf(rs.getString("role"))));
             return user;
         },
         email
@@ -173,7 +174,7 @@ public class UserRepository {
             userCreateDTO.getPassword(),
             true,
             userCreateDTO.getDescription(),
-            UserRole.USER
+            Set.of(UserRole.USER)
         );
     }
 
