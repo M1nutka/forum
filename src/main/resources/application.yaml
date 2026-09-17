@@ -1,12 +1,19 @@
 spring:
   application:
     name: forum
+  config:
+    import: "optional:file:.env[.properties]"
   datasource:
     url: jdbc:postgresql://localhost:5432/forum
     username: postgres
-    password: kT184do5teeuXW7
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
   
+
+jwt:
+  secret:
+    access: ${JWT_SECRET_ACCESS}
+    refresh: ${JWT_SECRET_REFRESH}
 # logging:
 #   level:
 #     org.springframework.security: DEBUG
