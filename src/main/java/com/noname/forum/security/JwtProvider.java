@@ -64,7 +64,15 @@ public class JwtProvider {
                 .compact();
     }
 
-    public boolean validateAccessToken(@NonNull String token, @NonNull SecretKey secret){
+    public boolean validateAccessToken(@NonNull String accessToken){
+        return  validateToken(accessToken, jwtAccessSecret);
+    }
+
+    public boolean validateRefreshToken(@NonNull String refreshToken){
+        return  validateToken(refreshToken, jwtRefreshSecret);
+    }
+
+    private boolean validateToken(@NonNull String token, @NonNull SecretKey secret){
         try {
             Jwts.parser()
                     .verifyWith(secret)
