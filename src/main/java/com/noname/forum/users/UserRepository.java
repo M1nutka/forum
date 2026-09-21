@@ -2,40 +2,39 @@ package com.noname.forum.users;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
-import com.noname.forum.security.SecurityController;
+import com.noname.forum.security.AuthController;
+
+
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 
 @Repository
+@RequiredArgsConstructor  
 public class UserRepository {
 
-    private static final Logger log = LoggerFactory.getLogger(SecurityController.class);
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
 
     private final JdbcTemplate jdbcTemplate;
-    private final PasswordEncoder passwordEncoder;
      
-    public UserRepository(JdbcTemplate jdbcTemplate,
-        PasswordEncoder passwordEncoder
-    ) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.passwordEncoder = passwordEncoder;
-    }
-
-
-
-    public List<User> getAllUser(){
+    public List<User> getAll(){
         String sql = """
                 SELECT u.id, u.username, u.email, u.name, u.lastname, u.born_is, u.phone, u.is_active, u.description, r.role
                 FROM users u
@@ -64,7 +63,7 @@ public class UserRepository {
         return users;
     }
 
-    public User getUserById(int id){
+    public User getById(int id){
         String sql = """
                 SELECT u.id, u.username, u.email, u.name, u.lastname, u.born_is, u.phone, u.is_active, u.description, r.role
                 FROM users u
@@ -96,41 +95,39 @@ public class UserRepository {
         return current_user;
     }
 
-    public User getUserByEmail(String email){
+    public Optional<User> getByUsername(@NonNull String username){
+        log.info("Get user by username = {}", username);
+        
         String sql = """
-                SELECT u.id, u.username, u.email, u.name, u.lastname, u.born_is, u.phone, u.password, u.is_active, u.description, r.role
+                SELECT u.id, u.username, u.email, u.name, u.lastname, u.born_is, u.phone, u.password, u.is_active, u.description
                 FROM users u
-                JOIN userroles ur ON u.id = ur.user_id
-                JOIN roles r ON ur.role_id = r.id
-                WHERE u.email = ?
+                WHERE u.username = ?
                 """;
-        User current_user  = jdbcTemplate.queryForObject(
-            sql,
-            (rs, rowNum) -> {
-            User user = new User();
-            user.setId(rs.getInt("id"));
-            user.setUsername(rs.getString("username"));
-            user.setEmail(rs.getString("email"));
-            user.setName(rs.getString("name"));
-            user.setLastname(rs.getString("lastname"));
+       
+        try {
+            User user = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> mapUser(rs), username);
+            user.setUserRole(findRolesByUserId(user.getId()));
+            return Optional.of(user);
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
+    }
 
-            Date date = (rs.getDate("born_is"));
-            user.setBornIs(date.toLocalDate());
-
-            user.setPhone(rs.getString("phone"));
-            user.setPassword(rs.getString("password"));
-            user.setIsActive(rs.getBoolean("is_active"));
-            user.setDescription(rs.getString("description"));
-            user.setUserRole(Set.of(UserRole.valueOf(rs.getString("role"))));
-            return user;
-        },
-        email
-    );
-        return current_user;
+    private Set<UserRole> findRolesByUserId(int id) {
+        String sql = """
+                SELECT r.role
+                FROM userroles ur
+                JOIN roles r ON ur.role_id = r.id
+                WHERE ur.user_id = ?
+                """;
+        return new HashSet<>(jdbcTemplate.queryForList(sql, String.class, id)
+            .stream()
+            .map(UserRole::valueOf)
+            .toList());
     }
 
 
-    public User registerUser(UserCreateDTO userCreateDTO) {
+    public User create(UserCreateDTO userCreateDTO) {
         String sql = """
                 INSERT INTO users(username, email, name, lastname, born_is, phone, password, is_active, description)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -178,7 +175,7 @@ public class UserRepository {
         );
     }
 
-    public User updateUser(int id, UserUpdateDTO updateDTO){
+    public User update(int id, UserUpdateDTO updateDTO){
         String sql = """
                 UPDATE users
                 SET username = ?, name = ?, email = ?, lastname = ?, born_is = ?, phone = ?, description = ?
@@ -212,11 +209,33 @@ public class UserRepository {
         );
     }
 
-    public void deleteUser(int id){
+    public void delete(int id){
         String sql = """
                     DELETE FROM users
                     WHERE id = ?
                 """;
         jdbcTemplate.update(sql, id);
     }
+
+    private static User mapUser(ResultSet rs) throws SQLException{
+        User user = new User();
+        user.setId(rs.getInt("id"));
+        user.setUsername(rs.getString("username"));
+        user.setEmail(rs.getString("email"));
+        user.setName(rs.getString("name"));
+        user.setLastname(rs.getString("lastname"));
+
+        Date date = (rs.getDate("born_is"));
+        if (date != null){
+                user.setBornIs(date.toLocalDate());
+        }
+
+        user.setPhone(rs.getString("phone"));
+        user.setPassword(rs.getString("password"));
+        user.setIsActive(rs.getBoolean("is_active"));
+        user.setDescription(rs.getString("description"));
+        // user.setUserRole(Set.of(UserRole.valueOf(rs.getString("role"))));
+        return user;
+    }
 }
+

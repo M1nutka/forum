@@ -10,9 +10,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.noname.forum.security.SecurityController;
+import com.noname.forum.security.AuthController;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,16 +23,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RestController
+@RequiredArgsConstructor 
 @RequestMapping("/users")
 public class UserController {
 
-    private static final Logger log = LoggerFactory.getLogger(SecurityController.class);
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
     private final UserService userService;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
     
     @GetMapping
     public ResponseEntity<List<User>> getAllUser() {
@@ -40,17 +39,17 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getMethodName(@PathVariable int id) {
+    public ResponseEntity<User> getUser(@PathVariable int id) {
         return ResponseEntity.ok().body(userService.getUserById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> putMethodName(@PathVariable int id, @RequestBody @Valid  UserUpdateDTO updateDTO) {
+    public ResponseEntity<User> userUpdate(@PathVariable int id, @RequestBody @Valid  UserUpdateDTO updateDTO) {
         return ResponseEntity.ok().body(userService.updateUser(id, updateDTO));
     }
     
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable int id){
+    public ResponseEntity<?> userRemove(@PathVariable int id){
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }

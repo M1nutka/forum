@@ -3,7 +3,7 @@ package com.noname.forum.posts;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.noname.forum.security.SecurityController;
+import com.noname.forum.security.AuthController;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @RequestMapping("/posts")
 public class PostController {
 
-    private static final Logger log = LoggerFactory.getLogger(SecurityController.class);
+    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
 
     private final PostService postService;

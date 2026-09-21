@@ -93,11 +93,11 @@ public class JwtProvider {
         return false;
     }
 
-    public Claims getAccessToken(@NonNull String token){
+    public Claims getAccessClaims(@NonNull String token){
         return getClaims(token,jwtAccessSecret);
     }
 
-    public Claims getRefreshToken(@NonNull String token){
+    public Claims getRefreshClaims(@NonNull String token){
         return getClaims(token,jwtRefreshSecret);
     }
 
