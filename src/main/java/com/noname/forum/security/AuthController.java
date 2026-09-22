@@ -2,6 +2,10 @@ package com.noname.forum.security;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import com.noname.forum.jwt.JwtRequest;
+import com.noname.forum.jwt.JwtResponse;
+import com.noname.forum.jwt.RefreshJwtRequest;
+
 import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
 

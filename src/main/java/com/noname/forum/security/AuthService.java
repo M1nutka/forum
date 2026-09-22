@@ -7,6 +7,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.noname.forum.jwt.JwtProvider;
+import com.noname.forum.jwt.JwtRequest;
+import com.noname.forum.jwt.JwtResponse;
 import com.noname.forum.users.User;
 import com.noname.forum.users.UserRepository;
 

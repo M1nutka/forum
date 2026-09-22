@@ -1,4 +1,4 @@
-package com.noname.forum.security;
+package com.noname.forum.jwt;
 
 import lombok.Getter;
 import lombok.Setter;
