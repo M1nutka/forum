@@ -29,7 +29,6 @@ public class UserRepository {
 
     private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
-
     private final JdbcTemplate jdbcTemplate;
 
     private final UserMapper userMapper;
@@ -41,16 +40,19 @@ public class UserRepository {
                 JOIN userroles ur ON u.id = ur.user_id
                 JOIN roles r ON ur.role_id = r.id
                 """;
+
         return jdbcTemplate.query(sql, (ResultSetExtractor<List<UserResponse>>) rs -> {
-            Map<Integer, UserResponse> map = new LinkedHashMap<>();
+            Map<Long, UserResponse> map = new LinkedHashMap<>();
             while (rs.next()) {
-                int id = rs.getInt("id");
+                Long id = rs.getLong("id");
                 UserResponse user = map.get(id);
 
                 if (user == null) {
-                    user = userMapper.mapAllUser(rs);
+                    user = userMapper.mapUserResponse(rs);
                     map.put(id, user);
                 }
+
+                user.setUserRole(new HashSet<>());
                 user.getUserRole().add(UserRole.valueOf(rs.getString("role")));
             }
             return new ArrayList<>(map.values());
@@ -63,7 +65,8 @@ public class UserRepository {
                 FROM users u
                 WHERE u.id = ?
                 """;
-        UserResponse user  = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> UserMapper.mapUserForResponse(rs), id);
+
+        UserResponse user  = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> userMapper.mapUserResponse(rs), id);
 
         user.setUserRole(findRolesByUserId(user.getId()));
 
@@ -77,8 +80,7 @@ public class UserRepository {
                 WHERE u.username = ?
                 """;
        
-        
-        UserResponse user = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> UserMapper.mapUserForResponse(rs), username);
+        UserResponse user = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> userMapper.mapUserResponse(rs), username);
 
         user.setUserRole(findRolesByUserId(user.getId()));
 
@@ -110,6 +112,7 @@ public class UserRepository {
                 JOIN roles r ON ur.role_id = r.id
                 WHERE ur.user_id = ?
                 """;
+
         return new HashSet<>(jdbcTemplate.queryForList(sql, String.class, id)
             .stream()
             .map(UserRole::valueOf)
@@ -123,18 +126,20 @@ public class UserRepository {
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 RETURNING id
                 """;
+
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         log.info("" + keyHolder);
 
-        jdbcTemplate.update(connection -> userMapper.mapUserForStatement(connection, userCreateDTO, sql), keyHolder);
+        jdbcTemplate.update(connection -> userMapper.mapUserStatement(connection, userCreateDTO, sql), keyHolder);
 
         long id = keyHolder.getKey().intValue();
             
         String sqlRole = """
-                    INSERT INTO userroles (user_id, role_id)
-                    VALUES (?, 1)
+                INSERT INTO userroles (user_id, role_id)
+                VALUES (?, 1)
                 """;
+
         jdbcTemplate.update(sqlRole, id);
 
         return getById(id);
@@ -155,9 +160,10 @@ public class UserRepository {
 
     public void delete(Long id){
         String sql = """
-                    DELETE FROM users
-                    WHERE id = ?
+                DELETE FROM users
+                WHERE id = ?
                 """;
+
         jdbcTemplate.update(sql, id);
     }
 }

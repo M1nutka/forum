@@ -44,7 +44,7 @@ public class UserController {
         return ResponseEntity.ok().body(userService.getUserById(id));
     }
 
-    @GetMapping("/{username}")
+    @GetMapping("/username/{username}")
     public ResponseEntity<UserResponse> getUserByUsername(@PathVariable String username) {
         return ResponseEntity.ok().body(userService.getByUsernameForResponse(username));
     }

@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.HashSet;
 
 import org.springframework.stereotype.Component;
 
@@ -31,7 +30,7 @@ public class UserMapper {
         return u;
     }
 
-    public static UserResponse mapUserForResponse(ResultSet rs) throws SQLException{
+    public UserResponse mapUserResponse(ResultSet rs) throws SQLException{
         UserResponse u = new UserResponse();
         u.setId(rs.getLong("id"));
         u.setUsername(rs.getString("username"));
@@ -48,25 +47,7 @@ public class UserMapper {
         return u;
     }
 
-    public UserResponse mapAllUser(ResultSet rs) throws SQLException {
-        UserResponse u = new UserResponse();
-        u.setId(rs.getLong("id"));
-        u.setUsername(rs.getString("username"));
-        u.setEmail(rs.getString("email"));
-        u.setName(rs.getString("name"));
-        u.setLastname(rs.getString("lastname"));
-
-        Date date = rs.getDate("born_is");
-        u.setBornIs(date == null ? null : date.toLocalDate());
-
-        u.setPhone(rs.getString("phone"));
-        u.setIsActive(rs.getBoolean("is_active"));
-        u.setDescription(rs.getString("description"));
-        u.setUserRole(new HashSet<>());
-        return u;
-    }
-
-    public PreparedStatement mapUserForStatement(Connection connection, UserRequestToCreate userCreateDTO, String sql) throws SQLException {
+    public PreparedStatement mapUserStatement(Connection connection, UserRequestToCreate userCreateDTO, String sql) throws SQLException {
         PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
         ps.setString(1, userCreateDTO.getUsername());
         ps.setString(2, userCreateDTO.getEmail());
