@@ -30,7 +30,7 @@ public class UserService {
         return  userRepository.getById(id);
     }
 
-    public User updateUser(Long id, UserRequestToUpdate updateDTO){
+    public UserResponse updateUser(Long id, UserRequestToUpdate updateDTO){
         log.info("Update user " + id);
         return userRepository.update(id, updateDTO);
     }

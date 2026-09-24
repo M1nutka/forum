@@ -36,27 +36,13 @@ public class SecurityConfig {
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .authorizeHttpRequests((request) -> request
-                .requestMatchers("/api/auth/token", "/api/auth/login", "/register", "/posts").permitAll()
+                .requestMatchers("/api/auth/token", "/api/auth/login", "/register").permitAll()
                 .anyRequest().authenticated()
         )
         .addFilterAfter(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-
-    // @Bean
-    // AuthenticationManager authenticationManager(
-    //     HttpSecurity http,
-    //     SecurityService SecurityService,
-    //     PasswordEncoder passwordEncoder
-    // ) throws Exception {
-    //     AuthenticationManagerBuilder authenticationManagerBuilder =
-    //         http.getSharedObject(AuthenticationManagerBuilder.class);
-    //     authenticationManagerBuilder
-    //         .userDetailsService(SecurityService)
-    //         .passwordEncoder(passwordEncoder);
-    //     return authenticationManagerBuilder.build();
-    // }
 
     @Bean PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

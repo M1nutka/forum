@@ -20,7 +20,7 @@ public class PostRepository {
 
     public List<PostResponse> findAllPosts(){
          String sql = """
-                SELECT p.id, p.title, p.description, p.created_at, u.id, u.username
+                SELECT p.id AS post_id, p.title, p.description, p.created_at, u.id AS user_id, u.username as author_username
                 FROM posts p
                 JOIN users u ON p.user_id = u.id
                 """;
@@ -32,7 +32,7 @@ public class PostRepository {
 
     public PostResponse findPostById(long id) {
         String sql = """
-                SELECT p.id, p.title, p.description, p.created_at, u.id, u.username
+                SELECT p.id AS post_id, p.title, p.description, p.created_at, u.id AS user_id, u.username as author_username
                 FROM posts p
                 JOIN users u ON p.user_id = u.id
                 WHERE p.id = ?
@@ -49,13 +49,14 @@ public class PostRepository {
 
     private static PostResponse mapPost (ResultSet rs) throws SQLException{
         AuthorResponse authRes = new AuthorResponse();
-        authRes.setId(rs.getLong("id"));
-        authRes.setUsername(rs.getString("username"));
+        authRes.setId(rs.getLong("user_id"));
+        authRes.setUsername(rs.getString("author_username"));
 
         PostResponse currentPost = new PostResponse();
+        currentPost.setId(rs.getLong("post_id"));
         currentPost.setTitle(rs.getString("title"));
         currentPost.setDescription(rs.getString("description"));
-        Timestamp date = (rs.getTimestamp("created_is"));
+        Timestamp date = (rs.getTimestamp("created_at"));
         currentPost.setCreatedAt(date.toLocalDateTime());
         currentPost.setAuthor(authRes);
         return currentPost;

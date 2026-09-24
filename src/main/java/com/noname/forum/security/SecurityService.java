@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.noname.forum.users.User;
 import com.noname.forum.users.UserRequestToCreate;
+import com.noname.forum.users.UserResponse;
 import com.noname.forum.users.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -20,10 +21,10 @@ public class SecurityService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
 
 
-    public User register(UserRequestToCreate userCreateDTO) {
+    public UserResponse register(UserRequestToCreate userCreateDTO) {
         String hashPassword = passwordEncoder.encode(userCreateDTO.getPassword());
         userCreateDTO.setPassword(hashPassword);
-        User user = repository.create(userCreateDTO);
+        UserResponse user = repository.create(userCreateDTO);
         return user;
     }
 

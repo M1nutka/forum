@@ -34,7 +34,7 @@ public class PostController {
     }
 
     @GetMapping("/{id}")
-    public PostResponse getPost(@PathVariable long id) {
+    public PostResponse getPost(@PathVariable Long id) {
         log.info("Get post id = " + id);
         return postService.getPost(id);
     }
