@@ -20,22 +20,22 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public List<User> getAllUser(){
+    public List<UserResponse> getAllUser(){
         log.info("Get all users");
         return userRepository.getAll();
     }
 
-    public User getUserById(int id){
+    public UserResponse getUserById(Long id){
         log.info("Get user by id = " + id);
         return  userRepository.getById(id);
     }
 
-    public User updateUser(int id, UserUpdateDTO updateDTO){
+    public User updateUser(Long id, UserRequestToUpdate updateDTO){
         log.info("Update user " + id);
         return userRepository.update(id, updateDTO);
     }
 
-    public void deleteUser(int id){
+    public void deleteUser(Long id){
         log.info("Delete user " + id);
         userRepository.delete(id);
     } 
@@ -43,6 +43,11 @@ public class UserService {
     public Optional<User> getByUsername(String username) {
         log.info("Get user by username = " + username);
         return userRepository.getByUsername(username);
+    }
+
+    public UserResponse getByUsernameForResponse(String username) {
+        log.info("Get user by username = " + username);
+        return userRepository.getByUsernameForResponse(username);
     }
 
 }

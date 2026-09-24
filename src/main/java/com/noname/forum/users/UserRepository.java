@@ -5,8 +5,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -14,11 +17,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import com.noname.forum.security.AuthController;
+
 
 
 import lombok.NonNull;
@@ -34,70 +39,58 @@ public class UserRepository {
 
     private final JdbcTemplate jdbcTemplate;
      
-    public List<User> getAll(){
+    public List<UserResponse> getAll(){
         String sql = """
                 SELECT u.id, u.username, u.email, u.name, u.lastname, u.born_is, u.phone, u.is_active, u.description, r.role
                 FROM users u
                 JOIN userroles ur ON u.id = ur.user_id
                 JOIN roles r ON ur.role_id = r.id
                 """;
-        List<User> users  = jdbcTemplate.query(
-            sql, 
-            (rs, rowNum) -> {
-            User user = new User();
-            user.setId(rs.getInt("id"));
-            user.setUsername(rs.getString("username"));
-            user.setEmail(rs.getString("email"));
-            user.setName(rs.getString("name"));
-            user.setLastname(rs.getString("lastname"));
+        return jdbcTemplate.query(sql, (ResultSetExtractor<List<UserResponse>>) rs -> {
+            Map<Integer, UserResponse> map = new LinkedHashMap<>();
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                UserResponse user = map.get(id);
 
-            Date date = (rs.getDate("born_is"));
-            user.setBornIs(date.toLocalDate());
-
-            user.setPhone(rs.getString("phone"));
-            user.setIsActive(rs.getBoolean("is_active"));
-            user.setDescription(rs.getString("description"));
-            user.setUserRole(Set.of(UserRole.valueOf(rs.getString("role"))));
-            return user;
+                if (user == null) {
+                    user = mapAllUser(rs);
+                    map.put(id, user);
+                }
+                user.getUserRole().add(UserRole.valueOf(rs.getString("role")));
+            }
+            return new ArrayList<>(map.values());
         });
-        return users;
     }
 
-    public User getById(int id){
+    public UserResponse getById(Long id){
         String sql = """
-                SELECT u.id, u.username, u.email, u.name, u.lastname, u.born_is, u.phone, u.is_active, u.description, r.role
+                SELECT u.id, u.username, u.email, u.name, u.lastname, u.born_is, u.phone, u.password, u.is_active, u.description
                 FROM users u
-                JOIN userroles ur ON u.id = ur.user_id
-                JOIN roles r ON ur.role_id = r.id
                 WHERE u.id = ?
                 """;
-        User current_user  = jdbcTemplate.queryForObject(
-            sql,
-            (rs, rowNum) -> {
-            User user = new User();
-            user.setId(rs.getInt("id"));
-            user.setUsername(rs.getString("username"));
-            user.setEmail(rs.getString("email"));
-            user.setName(rs.getString("name"));
-            user.setLastname(rs.getString("lastname"));
+        UserResponse user  = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> mapUserForResponse(rs), id);
 
-            Date date = (rs.getDate("born_is"));
-            user.setBornIs(date.toLocalDate());
+        user.setUserRole(findRolesByUserId(user.getId()));
 
-            user.setPhone(rs.getString("phone"));
-            user.setIsActive(rs.getBoolean("is_active"));
-            user.setDescription(rs.getString("description"));
-            user.setUserRole(Set.of(UserRole.valueOf(rs.getString("role"))));
-            return user;
-        },
-        id
-    );
-        return current_user;
+        return user;
     }
 
-    public Optional<User> getByUsername(@NonNull String username){
-        log.info("Get user by username = {}", username);
+    public UserResponse getByUsernameForResponse(@NonNull String username){        
+        String sql = """
+                SELECT u.id, u.username, u.email, u.name, u.lastname, u.born_is, u.phone, u.password, u.is_active, u.description
+                FROM users u
+                WHERE u.username = ?
+                """;
+       
         
+        UserResponse user = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> mapUserForResponse(rs), username);
+
+        user.setUserRole(findRolesByUserId(user.getId()));
+
+        return user;
+    }
+
+    public Optional<User> getByUsername(@NonNull String username){        
         String sql = """
                 SELECT u.id, u.username, u.email, u.name, u.lastname, u.born_is, u.phone, u.password, u.is_active, u.description
                 FROM users u
@@ -106,14 +99,16 @@ public class UserRepository {
        
         try {
             User user = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> mapUser(rs), username);
+
             user.setUserRole(findRolesByUserId(user.getId()));
+
             return Optional.of(user);
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
     }
 
-    private Set<UserRole> findRolesByUserId(int id) {
+    private Set<UserRole> findRolesByUserId(Long id) {
         String sql = """
                 SELECT r.role
                 FROM userroles ur
@@ -127,7 +122,7 @@ public class UserRepository {
     }
 
 
-    public User create(UserCreateDTO userCreateDTO) {
+    public User create(UserRequestToCreate userCreateDTO) {
         String sql = """
                 INSERT INTO users(username, email, name, lastname, born_is, phone, password, is_active, description)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -175,16 +170,15 @@ public class UserRepository {
         );
     }
 
-    public User update(int id, UserUpdateDTO updateDTO){
+    public User update(Long id, UserRequestToUpdate updateDTO){
         String sql = """
                 UPDATE users
-                SET username = ?, name = ?, email = ?, lastname = ?, born_is = ?, phone = ?, description = ?
+                SET name = ?, email = ?, lastname = ?, born_is = ?, phone = ?, description = ?
                 WHERE id = ?
                 """;
 
         jdbcTemplate.update(
             sql,
-            updateDTO.getUsername(),
             updateDTO.getName(),
             updateDTO.getEmail(),
             updateDTO.getLastname(),
@@ -196,7 +190,7 @@ public class UserRepository {
 
         return new User(
             id,
-            updateDTO.getUsername(),
+            null,
             updateDTO.getEmail(),
             updateDTO.getName(),
             updateDTO.getLastname(),
@@ -209,7 +203,7 @@ public class UserRepository {
         );
     }
 
-    public void delete(int id){
+    public void delete(Long id){
         String sql = """
                     DELETE FROM users
                     WHERE id = ?
@@ -218,24 +212,55 @@ public class UserRepository {
     }
 
     private static User mapUser(ResultSet rs) throws SQLException{
-        User user = new User();
-        user.setId(rs.getInt("id"));
-        user.setUsername(rs.getString("username"));
-        user.setEmail(rs.getString("email"));
-        user.setName(rs.getString("name"));
-        user.setLastname(rs.getString("lastname"));
+        User u = new User();
+        u.setId(rs.getLong("id"));
+        u.setUsername(rs.getString("username"));
+        u.setEmail(rs.getString("email"));
+        u.setName(rs.getString("name"));
+        u.setLastname(rs.getString("lastname"));
 
-        Date date = (rs.getDate("born_is"));
-        if (date != null){
-                user.setBornIs(date.toLocalDate());
-        }
+        Date date = rs.getDate("born_is");
+        u.setBornIs(date == null ? null : date.toLocalDate());
 
-        user.setPhone(rs.getString("phone"));
-        user.setPassword(rs.getString("password"));
-        user.setIsActive(rs.getBoolean("is_active"));
-        user.setDescription(rs.getString("description"));
-        // user.setUserRole(Set.of(UserRole.valueOf(rs.getString("role"))));
-        return user;
+        u.setPhone(rs.getString("phone"));
+        u.setIsActive(rs.getBoolean("is_active"));
+        u.setDescription(rs.getString("description"));
+        return u;
+    }
+
+        private static UserResponse mapUserForResponse(ResultSet rs) throws SQLException{
+        UserResponse u = new UserResponse();
+        u.setId(rs.getLong("id"));
+        u.setUsername(rs.getString("username"));
+        u.setEmail(rs.getString("email"));
+        u.setName(rs.getString("name"));
+        u.setLastname(rs.getString("lastname"));
+
+        Date date = rs.getDate("born_is");
+        u.setBornIs(date == null ? null : date.toLocalDate());
+
+        u.setPhone(rs.getString("phone"));
+        u.setIsActive(rs.getBoolean("is_active"));
+        u.setDescription(rs.getString("description"));
+        return u;
+    }
+
+    private UserResponse mapAllUser(ResultSet rs) throws SQLException {
+        UserResponse u = new UserResponse();
+        u.setId(rs.getLong("id"));
+        u.setUsername(rs.getString("username"));
+        u.setEmail(rs.getString("email"));
+        u.setName(rs.getString("name"));
+        u.setLastname(rs.getString("lastname"));
+
+        Date date = rs.getDate("born_is");
+        u.setBornIs(date == null ? null : date.toLocalDate());
+
+        u.setPhone(rs.getString("phone"));
+        u.setIsActive(rs.getBoolean("is_active"));
+        u.setDescription(rs.getString("description"));
+        u.setUserRole(new HashSet<>());
+        return u;
     }
 }
 

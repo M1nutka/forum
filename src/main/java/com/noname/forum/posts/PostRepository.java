@@ -1,5 +1,7 @@
 package com.noname.forum.posts;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -16,51 +18,47 @@ public class PostRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public List<Post> getAllPosts(){
+    public List<PostResponse> findAllPosts(){
          String sql = """
-                SELECT p.id, p.title, p.description, p.created_at, p.user_id
+                SELECT p.id, p.title, p.description, p.created_at, u.id, u.username
                 FROM posts p
+                JOIN users u ON p.user_id = u.id
                 """;
 
-        List<Post> posts  = jdbcTemplate.query(
-            sql, 
-            (rs, rowNum) -> {
-            Post post = new Post();
-            post.setId(rs.getLong("id"));
-            post.setUserId(rs.getLong("user_id"));
-            post.setTitle(rs.getString("title"));
-            post.setDescription(rs.getString("description"));
-            Timestamp date = (rs.getTimestamp("created_is"));
-            post.setCreated_at(date.toLocalDateTime());
-            return post;
-        });
+        List<PostResponse> postsResponse = jdbcTemplate.query(sql, (rs, rowNum) -> mapPost(rs));
 
-        return posts;
+        return postsResponse;
     }
 
-    public Post getPostById(long id) {
+    public PostResponse findPostById(long id) {
         String sql = """
-                SELECT p.id, p.title, p.description, p.created_at, p.user_id
+                SELECT p.id, p.title, p.description, p.created_at, u.id, u.username
                 FROM posts p
-                WHERE id = ?
+                JOIN users u ON p.user_id = u.id
+                WHERE p.id = ?
                 """;
 
-        Post post =jdbcTemplate.queryForObject(
-            sql,
-            (rs, rowNum) -> {
-                Post currentPost = new Post();
-                currentPost.setId(id);
-                currentPost.setUserId(rs.getLong("user_id"));
-                currentPost.setTitle(rs.getString("title"));
-                currentPost.setDescription(rs.getString("description"));
-                Timestamp date = (rs.getTimestamp("created_is"));
-                currentPost.setCreated_at(date.toLocalDateTime());
-                return currentPost;
-                },
-            id
-            );
+        PostResponse postResponse = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> mapPost(rs), id);
     
-        return post;
+        return postResponse;
+    }
+
+    public Post createPost(){
+        return new Post();
+    }
+
+    private static PostResponse mapPost (ResultSet rs) throws SQLException{
+        AuthorResponse authRes = new AuthorResponse();
+        authRes.setId(rs.getLong("id"));
+        authRes.setUsername(rs.getString("username"));
+
+        PostResponse currentPost = new PostResponse();
+        currentPost.setTitle(rs.getString("title"));
+        currentPost.setDescription(rs.getString("description"));
+        Timestamp date = (rs.getTimestamp("created_is"));
+        currentPost.setCreatedAt(date.toLocalDateTime());
+        currentPost.setAuthor(authRes);
+        return currentPost;
     }
 
     

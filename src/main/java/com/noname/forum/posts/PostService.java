@@ -4,15 +4,18 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
+
 @Service 
+@RequiredArgsConstructor 
 public class PostService {
     private final PostRepository postRepository;
 
-    PostService(PostRepository postRepository) {
-        this.postRepository = postRepository;
+    public List<PostResponse> getAllPosts(){
+        return postRepository.findAllPosts();
     }
 
-    public List<Post> getAllPosts(){
-        return postRepository.getAllPosts();
+    public PostResponse getPost(long id){
+        return postRepository.findPostById(id);
     }
 }

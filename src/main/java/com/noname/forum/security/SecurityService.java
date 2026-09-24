@@ -7,7 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.noname.forum.users.User;
-import com.noname.forum.users.UserCreateDTO;
+import com.noname.forum.users.UserRequestToCreate;
 import com.noname.forum.users.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ public class SecurityService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
 
 
-    public User register(UserCreateDTO userCreateDTO) {
+    public User register(UserRequestToCreate userCreateDTO) {
         String hashPassword = passwordEncoder.encode(userCreateDTO.getPassword());
         userCreateDTO.setPassword(hashPassword);
         User user = repository.create(userCreateDTO);
@@ -30,8 +30,8 @@ public class SecurityService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    User user = repository.getByUsername(username)
-        .orElseThrow(() -> new UsernameNotFoundException("User not found " + username));
-    return user;
-}
+        User user = repository.getByUsername(username)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found " + username));
+        return user;
+    }
 }

@@ -9,7 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class PostCreateDTO {
+public class PostRequest {
     private String title;
     private String description;
 }

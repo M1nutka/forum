@@ -20,7 +20,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class User implements UserDetails {
-    private Integer id;
+    private Long id;
     private String username;
     private String email;
     private String name;

@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 
 
+
 @RestController
 @RequiredArgsConstructor 
 @RequestMapping("/users")
@@ -33,23 +34,29 @@ public class UserController {
 
     
     @GetMapping
-    public ResponseEntity<List<User>> getAllUser() {
+    public ResponseEntity<List<UserResponse>> getAllUser() {
         log.info("Get all users, controller");
         return ResponseEntity.ok().body(userService.getAllUser());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable int id) {
+    public ResponseEntity<UserResponse> getUser(@PathVariable Long id) {
         return ResponseEntity.ok().body(userService.getUserById(id));
     }
 
+    @GetMapping("/{username}")
+    public ResponseEntity<UserResponse> getUserByUsername(@PathVariable String username) {
+        return ResponseEntity.ok().body(userService.getByUsernameForResponse(username));
+    }
+    
+
     @PutMapping("/{id}")
-    public ResponseEntity<User> userUpdate(@PathVariable int id, @RequestBody @Valid  UserUpdateDTO updateDTO) {
+    public ResponseEntity<User> userUpdate(@PathVariable Long id, @RequestBody @Valid  UserRequestToUpdate updateDTO) {
         return ResponseEntity.ok().body(userService.updateUser(id, updateDTO));
     }
     
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> userRemove(@PathVariable int id){
+    public ResponseEntity<?> userRemove(@PathVariable Long id){
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }

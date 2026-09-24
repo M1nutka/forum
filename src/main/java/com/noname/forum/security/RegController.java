@@ -3,7 +3,7 @@ package com.noname.forum.security;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.noname.forum.users.User;
-import com.noname.forum.users.UserCreateDTO;
+import com.noname.forum.users.UserRequestToCreate;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,7 +19,7 @@ public class RegController {
 
 
     @PostMapping("/register")
-    public User regester(@RequestBody UserCreateDTO userCreateDTO) {
+    public User regester(@RequestBody UserRequestToCreate userCreateDTO) {
         
         return securityService.register(userCreateDTO);
     }
