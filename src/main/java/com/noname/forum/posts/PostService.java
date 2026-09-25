@@ -31,6 +31,14 @@ public class PostService {
 
         return postRepository.updatePost(request, id);
     }
+
+    public void deletePost(Long id, Long userId) {
+        if (!postRepository.isAuthorPost(id, userId)) {
+            throw new AccessDeniedException("User is not author post");
+        }
+        
+        postRepository.deletePost(id);
+    }
 }
 
 

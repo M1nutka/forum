@@ -13,6 +13,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -53,9 +54,15 @@ public class PostController {
     }
 
     @PutMapping("/{id}")
-    public PostResponse putMethodName(@PathVariable Long id, @AuthenticationPrincipal Long userId,  @RequestBody PostRequest request) throws AccessDeniedException {
+    public PostResponse putPost(@PathVariable Long id, @AuthenticationPrincipal Long userId,  @RequestBody PostRequest request) throws AccessDeniedException {
         log.info("Change post info id = " + id + ". UserId = " + userId);
         return postService.updatePost(request, id, userId);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deletePost(@PathVariable Long id, @AuthenticationPrincipal Long userId){
+        log.info("Delete post id = " + id + ". UserId = " + userId);
+        postService.deletePost(id, userId);
     }
     
 }

@@ -88,4 +88,13 @@ public class PostRepository {
 
         return findPostId(id);
     }
+
+    public void deletePost(Long id) {
+        String sql = """
+                DELETE FROM posts
+                WHERE id = ?
+                """;
+
+        jdbcTemplate.update(sql, id);
+    }
 }
