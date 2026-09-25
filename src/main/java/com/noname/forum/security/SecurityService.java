@@ -7,7 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.noname.forum.users.User;
-import com.noname.forum.users.UserRequestToCreate;
+import com.noname.forum.users.UserRequestCreate;
 import com.noname.forum.users.UserResponse;
 import com.noname.forum.users.UserRepository;
 
@@ -21,7 +21,7 @@ public class SecurityService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
 
 
-    public UserResponse register(UserRequestToCreate userCreateDTO) {
+    public UserResponse register(UserRequestCreate userCreateDTO) {
         String hashPassword = passwordEncoder.encode(userCreateDTO.getPassword());
         userCreateDTO.setPassword(hashPassword);
         UserResponse user = repository.create(userCreateDTO);

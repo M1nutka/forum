@@ -8,8 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -17,7 +16,6 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import com.noname.forum.security.AuthController;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +24,6 @@ import lombok.RequiredArgsConstructor;
 @Repository
 @RequiredArgsConstructor  
 public class UserRepository {
-
-    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -120,7 +116,7 @@ public class UserRepository {
     }
 
 
-    public UserResponse create(UserRequestToCreate userCreateDTO) {
+    public UserResponse create(UserRequestCreate userCreateDTO) {
         String sql = """
                 INSERT INTO users(username, email, name, lastname, born_is, phone, password, is_active, description)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -128,8 +124,6 @@ public class UserRepository {
                 """;
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
-
-        log.info("" + keyHolder);
 
         jdbcTemplate.update(connection -> userMapper.mapUserStatement(connection, userCreateDTO, sql), keyHolder);
 
@@ -145,7 +139,7 @@ public class UserRepository {
         return getById(id);
     }
 
-    public UserResponse update(Long id, UserRequestToUpdate updateDTO){
+    public UserResponse update(Long id, UserRequestUpdate updateDTO){
         String sql = """
                 UPDATE users
                 SET name = ?, email = ?, lastname = ?, born_is = ?, phone = ?, description = ?

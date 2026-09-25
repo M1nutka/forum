@@ -1,7 +1,10 @@
 package com.noname.forum.posts;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Timestamp;
 
 import org.springframework.stereotype.Component;
@@ -22,5 +25,13 @@ public class PostMapper {
         currentPost.setCreatedAt(date.toLocalDateTime());
         currentPost.setAuthor(authRes);
         return currentPost;
+    }
+
+    public PreparedStatement mapPostStatement(Connection connection, PostRequest postRequest, Long author_id, String sql) throws SQLException {
+        PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        ps.setString(1, postRequest.getTitle());
+        ps.setString(2, postRequest.getDescription());
+        ps.setLong(3, author_id);
+        return ps;
     }
 }

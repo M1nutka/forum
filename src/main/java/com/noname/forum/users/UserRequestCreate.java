@@ -16,7 +16,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class UserRequestToCreate {
+public class UserRequestCreate {
     @NotEmpty (message = "Username cannot be empty")
     @Size (min = 3, max = 50, message = "Username must be between 3 and 50 characters")
     private String username;

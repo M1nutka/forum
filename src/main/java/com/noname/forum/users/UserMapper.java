@@ -47,7 +47,7 @@ public class UserMapper {
         return u;
     }
 
-    public PreparedStatement mapUserStatement(Connection connection, UserRequestToCreate userCreateDTO, String sql) throws SQLException {
+    public PreparedStatement mapUserStatement(Connection connection, UserRequestCreate userCreateDTO, String sql) throws SQLException {
         PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
         ps.setString(1, userCreateDTO.getUsername());
         ps.setString(2, userCreateDTO.getEmail());
