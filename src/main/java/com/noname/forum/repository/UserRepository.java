@@ -18,9 +18,9 @@ import org.springframework.stereotype.Repository;
 
 import com.noname.forum.domain.User;
 import com.noname.forum.domain.UserRole;
-import com.noname.forum.dto.UserRequestCreate;
-import com.noname.forum.dto.UserRequestUpdate;
-import com.noname.forum.dto.UserResponse;
+import com.noname.forum.dto.user.UserRequestCreate;
+import com.noname.forum.dto.user.UserRequestUpdate;
+import com.noname.forum.dto.user.UserResponse;
 import com.noname.forum.map.UserMapper;
 
 import lombok.NonNull;

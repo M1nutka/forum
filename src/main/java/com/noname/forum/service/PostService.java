@@ -5,8 +5,8 @@ import java.util.List;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
-import com.noname.forum.dto.PostRequest;
-import com.noname.forum.dto.PostResponse;
+import com.noname.forum.dto.post.PostRequest;
+import com.noname.forum.dto.post.PostResponse;
 import com.noname.forum.repository.PostRepository;
 
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package com.noname.forum.dto;
+package com.noname.forum.dto.post;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;

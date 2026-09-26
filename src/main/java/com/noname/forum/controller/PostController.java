@@ -3,8 +3,8 @@ package com.noname.forum.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.noname.forum.dto.PostRequest;
-import com.noname.forum.dto.PostResponse;
+import com.noname.forum.dto.post.PostRequest;
+import com.noname.forum.dto.post.PostResponse;
 import com.noname.forum.service.PostService;
 
 import lombok.RequiredArgsConstructor;

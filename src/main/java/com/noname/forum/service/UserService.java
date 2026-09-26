@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 
 import com.noname.forum.controller.AuthController;
 import com.noname.forum.domain.User;
-import com.noname.forum.dto.UserRequestUpdate;
-import com.noname.forum.dto.UserResponse;
+import com.noname.forum.dto.user.UserRequestUpdate;
+import com.noname.forum.dto.user.UserResponse;
 import com.noname.forum.repository.UserRepository;
 
 @Service

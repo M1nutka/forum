@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.noname.forum.dto.UserRequestUpdate;
-import com.noname.forum.dto.UserResponse;
+import com.noname.forum.dto.user.UserRequestUpdate;
+import com.noname.forum.dto.user.UserResponse;
 import com.noname.forum.service.UserService;
 
 import jakarta.validation.Valid;

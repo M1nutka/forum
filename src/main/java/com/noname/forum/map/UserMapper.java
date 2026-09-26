@@ -10,8 +10,8 @@ import java.sql.Statement;
 import org.springframework.stereotype.Component;
 
 import com.noname.forum.domain.User;
-import com.noname.forum.dto.UserRequestCreate;
-import com.noname.forum.dto.UserResponse;
+import com.noname.forum.dto.user.UserRequestCreate;
+import com.noname.forum.dto.user.UserResponse;
 
 @Component 
 public class UserMapper {

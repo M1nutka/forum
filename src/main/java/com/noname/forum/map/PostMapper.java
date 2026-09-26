@@ -9,9 +9,9 @@ import java.sql.Timestamp;
 
 import org.springframework.stereotype.Component;
 
-import com.noname.forum.dto.AuthorResponse;
-import com.noname.forum.dto.PostRequest;
-import com.noname.forum.dto.PostResponse;
+import com.noname.forum.dto.post.AuthorResponse;
+import com.noname.forum.dto.post.PostRequest;
+import com.noname.forum.dto.post.PostResponse;
 
 @Component 
 public class PostMapper {

@@ -7,8 +7,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.noname.forum.domain.User;
-import com.noname.forum.dto.UserRequestCreate;
-import com.noname.forum.dto.UserResponse;
+import com.noname.forum.dto.user.UserRequestCreate;
+import com.noname.forum.dto.user.UserResponse;
 import com.noname.forum.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;

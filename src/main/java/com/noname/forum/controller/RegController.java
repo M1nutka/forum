@@ -2,8 +2,8 @@ package com.noname.forum.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.noname.forum.dto.UserRequestCreate;
-import com.noname.forum.dto.UserResponse;
+import com.noname.forum.dto.user.UserRequestCreate;
+import com.noname.forum.dto.user.UserResponse;
 import com.noname.forum.service.SecurityService;
 
 import lombok.RequiredArgsConstructor;

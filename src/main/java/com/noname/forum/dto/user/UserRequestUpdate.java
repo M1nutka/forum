@@ -1,4 +1,4 @@
-package com.noname.forum.dto;
+package com.noname.forum.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

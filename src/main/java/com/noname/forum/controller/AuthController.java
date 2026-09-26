@@ -2,9 +2,9 @@ package com.noname.forum.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.noname.forum.dto.RefreshJwtRequest;
 import com.noname.forum.dto.jwt.JwtRequest;
 import com.noname.forum.dto.jwt.JwtResponse;
+import com.noname.forum.dto.jwt.RefreshJwtRequest;
 import com.noname.forum.service.AuthService;
 
 import jakarta.security.auth.message.AuthException;

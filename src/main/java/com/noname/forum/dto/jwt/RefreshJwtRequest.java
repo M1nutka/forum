@@ -1,4 +1,4 @@
-package com.noname.forum.dto;
+package com.noname.forum.dto.jwt;
 
 import lombok.Getter;
 import lombok.Setter;

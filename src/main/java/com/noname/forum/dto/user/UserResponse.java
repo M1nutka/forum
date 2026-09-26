@@ -1,4 +1,4 @@
-package com.noname.forum.dto;
+package com.noname.forum.dto.user;
 
 import java.time.LocalDate;
 import java.util.Set;

@@ -9,8 +9,8 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import com.noname.forum.dto.PostRequest;
-import com.noname.forum.dto.PostResponse;
+import com.noname.forum.dto.post.PostRequest;
+import com.noname.forum.dto.post.PostResponse;
 import com.noname.forum.map.PostMapper;
 
 import lombok.RequiredArgsConstructor;
