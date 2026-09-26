@@ -10,6 +10,7 @@ import com.noname.forum.service.AuthService;
 import jakarta.security.auth.message.AuthException;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,21 +31,21 @@ public class AuthController {
     public ResponseEntity<JwtResponse> login(@RequestBody JwtRequest authRequest) throws AuthException {
         final JwtResponse token = authService.login(authRequest);
         log.info("Login user " + authRequest.getLogin());
-        return ResponseEntity.ok(token);
+        return ResponseEntity.status(HttpStatus.OK).body(token);
     }
 
     @PostMapping("/token")
     public ResponseEntity<JwtResponse> getNewAccessToken(@RequestBody RefreshJwtRequest request) throws AuthException {
         final JwtResponse token = authService.getAccessToken(request.getRefreshToken());     
         log.info("User try get token");
-        return ResponseEntity.ok(token);
+        return ResponseEntity.status(HttpStatus.OK).body(token);
     }
 
     @PostMapping("/refresh")
     public ResponseEntity<JwtResponse> getNewRefreshToken(@RequestBody RefreshJwtRequest request) throws AuthException {
         final JwtResponse token = authService.refresh(request.getRefreshToken());
         log.info("User try get refresh");
-        return ResponseEntity.ok(token);
+        return ResponseEntity.status(HttpStatus.OK).body(token);
     }
     
     

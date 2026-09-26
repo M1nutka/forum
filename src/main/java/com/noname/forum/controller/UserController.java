@@ -3,6 +3,7 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,28 +39,28 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<UserResponse>> getAllUser() {
         log.info("Get all users, controller");
-        return ResponseEntity.ok().body(userService.getAllUser());
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getAllUser());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUser(@PathVariable Long id) {
-        return ResponseEntity.ok().body(userService.getUserById(id));
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserById(id));
     }
 
     @GetMapping("/username/{username}")
     public ResponseEntity<UserResponse> getUserByUsername(@PathVariable String username) {
-        return ResponseEntity.ok().body(userService.getByUsernameForResponse(username));
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getByUsernameForResponse(username));
     }
     
 
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> userUpdate(@PathVariable Long id, @RequestBody @Valid  UserRequestUpdate updateDTO) {
-        return ResponseEntity.ok().body(userService.updateUser(id, updateDTO));
+        return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(id, updateDTO));
     }
     
     @DeleteMapping("/{id}")
     public ResponseEntity<?> userRemove(@PathVariable Long id){
         userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
