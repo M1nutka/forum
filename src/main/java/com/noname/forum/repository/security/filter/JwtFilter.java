@@ -1,4 +1,4 @@
-package com.noname.forum.security.filter;
+package com.noname.forum.repository.security.filter;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -11,7 +11,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.noname.forum.domain.User;
-import com.noname.forum.security.provider.JwtProvider;
+import com.noname.forum.repository.security.provider.JwtProvider;
 import com.noname.forum.service.UserService;
 
 import io.jsonwebtoken.Claims;
