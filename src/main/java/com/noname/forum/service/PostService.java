@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import com.noname.forum.domain.Post;
+import com.noname.forum.domain.User;
 import com.noname.forum.dto.post.PostRequest;
 import com.noname.forum.dto.post.PostResponse;
 import com.noname.forum.repository.PostRepository;
@@ -17,31 +19,51 @@ public class PostService {
     private final PostRepository postRepository;
 
     public List<PostResponse> getAllPosts(){
-        return postRepository.findAllPosts();
+        return postRepository.findAllPosts().stream()
+            .map(PostResponse::from)
+            .toList();
     }
 
     public PostResponse getPost(Long id){
-        return postRepository.findPostId(id);
+        return PostResponse.from(postRepository.findPostId(id));
     }
 
     public PostResponse createPost(PostRequest request, Long authorId) {
-        return  postRepository.createPost(request, authorId);
+        Post postCreate = new Post();
+        postCreate.setTitle(request.title());
+        postCreate.setDescription(request.description());
+        
+        User author = new User();
+        author.setId(authorId);
+
+        postCreate.setAuthor(author);
+        return PostResponse.from(postRepository.createPost(postCreate));
     }
 
     public PostResponse updatePost(PostRequest request, Long id, Long userId) throws AccessDeniedException {
-        if (!postRepository.isAuthorPost(id, userId)) {
+         // TODO: Добавть проверку на админа
+        if (postRepository.isAuthorPost(id) != userId) {
             throw new AccessDeniedException("User is not author post");
         }
 
-        return postRepository.updatePost(request, id);
+        Post postUpdate = new Post();
+        postUpdate.setTitle(request.title());
+        postUpdate.setDescription(request.description());
+        postUpdate.setId(id);
+
+        return PostResponse.from(postRepository.updatePost(postUpdate));
     }
 
     public void deletePost(Long id, Long userId) {
-        if (!postRepository.isAuthorPost(id, userId)) {
+         // TODO: Добавть проверку на админа
+        if (postRepository.isAuthorPost(id) != userId) {
             throw new AccessDeniedException("User is not author post");
         }
         
-        postRepository.deletePost(id);
+        Post postDelete = new Post();
+        postDelete.setId(id);
+
+        postRepository.deletePost(postDelete);
     }
 }
 

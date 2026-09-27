@@ -3,15 +3,11 @@ package com.noname.forum.repository;
 
 import java.util.List;
 
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import com.noname.forum.dto.post.PostRequest;
-import com.noname.forum.dto.post.PostResponse;
-import com.noname.forum.map.PostMapper;
+import com.noname.forum.domain.Post;
+import com.noname.forum.map.PostRowMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,86 +15,72 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor 
 public class PostRepository {
     
-
     private final JdbcTemplate jdbcTemplate;
 
-    private final PostMapper postMapper;
+    private final PostRowMapper postRowMapper;
 
-    public List<PostResponse> findAllPosts(){
-         String sql = """
+    private static final String SELECT_ALL = """
                 SELECT p.id AS post_id, p.title, p.description, p.created_at, u.id AS user_id, u.username as author_username
                 FROM posts p
                 JOIN users u ON p.user_id = u.id
                 """;
 
-        List<PostResponse> postsResponse = jdbcTemplate.query(sql, (rs, rowNum) -> postMapper.mapPost(rs));
-
-        return postsResponse;
-    }
-
-    public PostResponse findPostId(long id) {
-        String sql = """
-                SELECT p.id AS post_id, p.title, p.description, p.created_at, u.id AS user_id, u.username as author_username
-                FROM posts p
-                JOIN users u ON p.user_id = u.id
-                WHERE p.id = ?
-                """;
-
-        PostResponse postResponse = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> postMapper.mapPost(rs), id);
-    
-        return postResponse;
-    }
-
-    public PostResponse createPost(PostRequest request, Long authorId){
-        String sql = """
+    private static final String CREATE = """
                 INSERT INTO posts (title, description, user_id)
                 VALUES (?, ?, ?)
                 RETURNING id
                 """;
 
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        
-        jdbcTemplate.update(connection -> postMapper.mapPostStatement(connection, request, authorId, sql), keyHolder);
-
-        long id = keyHolder.getKey().intValue();
-
-        return findPostId(id);
-
-    }
-
-    public boolean isAuthorPost(Long id, Long userId) {
-        String sql = """
+    private static final String IS_AUTHOR = """
                 SELECT user_id
                 FROM posts
                 WHERE id = ?
                 """;
 
-        try {
-            Long authorId = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> rs.getLong("user_id"), id);
-            return userId.equals(authorId);
-        } catch (EmptyResultDataAccessException e) {
-            return false;
-        }
-    }
-
-    public PostResponse updatePost(PostRequest request, Long id) {
-        String sql = """
+    private static final String UPDATE = """
                 UPDATE posts
                 SET title = ?, description = ?
                 WHERE id = ?
                 """;
-                
-        jdbcTemplate.update(sql, request.title(), request.description(), id);
 
-        return findPostId(id);
-    }
-
-    public void deletePost(Long id) {
-        String sql = """
+    private static final String DELETE = """
                 DELETE FROM posts
                 WHERE id = ?
                 """;
 
-        jdbcTemplate.update(sql, id);
+    public List<Post> findAllPosts(){
+        List<Post> posts = jdbcTemplate.query(SELECT_ALL, postRowMapper);
+        return posts;
+    }
+
+    public Post findPostId(long id) {
+        Post post = jdbcTemplate.queryForObject(SELECT_ALL + " WHERE p.id = ?", postRowMapper, id);
+        return post;
+    }
+
+    public Post createPost(Post post){
+        Long id = jdbcTemplate.queryForObject(
+            CREATE,
+            Long.class,
+            post.getTitle(),
+            post.getDescription(),
+            post.getAuthor().getId()
+        );
+
+        post.setId(id);
+        return post;
+    }
+
+    public Long isAuthorPost(Long id) {
+        return jdbcTemplate.queryForObject(IS_AUTHOR, Long.class, id); 
+    }
+
+    public Post updatePost(Post post) { 
+        jdbcTemplate.update(UPDATE, post.getTitle(), post.getDescription(), post.getId());
+        return post;
+    }
+
+    public void deletePost(Post post) {
+        jdbcTemplate.update(DELETE, post.getId());
     }
 }

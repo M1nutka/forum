@@ -14,6 +14,3 @@ jwt:
   secret:
     access: ${JWT_SECRET_ACCESS}
     refresh: ${JWT_SECRET_REFRESH}
-# logging:
-#   level:
-#     org.springframework.security: DEBUG
