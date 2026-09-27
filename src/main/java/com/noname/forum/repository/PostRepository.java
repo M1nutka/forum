@@ -88,7 +88,7 @@ public class PostRepository {
                 WHERE id = ?
                 """;
                 
-        jdbcTemplate.update(sql, request.getTitle(), request.getDescription(), id);
+        jdbcTemplate.update(sql, request.title(), request.description(), id);
 
         return findPostId(id);
     }

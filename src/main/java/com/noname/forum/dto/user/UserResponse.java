@@ -5,24 +5,23 @@ import java.util.Set;
 
 import com.noname.forum.domain.UserRole;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+public record UserResponse(
+    Long id,
+    String username,
+    String email,
+    String name,
+    String lastname,
+    LocalDate bornIs,
+    String phone,
+    Boolean isActive,
+    String description,
+    Set<UserRole> userRole
+) {
+    public UserResponse{
+        userRole = userRole == null ? Set.of() : Set.copyOf(userRole);
+    }
 
-@Getter 
-@Setter 
-@AllArgsConstructor 
-@NoArgsConstructor 
-public class UserResponse {
-    private Long id;
-    private String username;
-    private String email;
-    private String name;
-    private String lastname;
-    private LocalDate bornIs;
-    private String phone;
-    private Boolean isActive;
-    private String description;
-    private Set<UserRole> userRole;
-}
+    public UserResponse withRoles (Set<UserRole>role){
+        return new UserResponse(id, username, email, name, lastname, bornIs, phone, isActive, description, role);
+    }
+} 

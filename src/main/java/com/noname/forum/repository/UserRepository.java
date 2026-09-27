@@ -1,6 +1,7 @@
 package com.noname.forum.repository;
 
-import java.util.ArrayList;
+import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -44,20 +45,30 @@ public class UserRepository {
                 """;
 
         return jdbcTemplate.query(sql, (ResultSetExtractor<List<UserResponse>>) rs -> {
-            Map<Long, UserResponse> map = new LinkedHashMap<>();
+
+            Map<Long, UserResponse> userById = new LinkedHashMap<>();
+            Map<Long, Set<UserRole>> roleById = new HashMap<>();
             while (rs.next()) {
                 Long id = rs.getLong("id");
-                UserResponse user = map.get(id);
+                
+                userById.computeIfAbsent(id, k -> {
+                    try {
+                        return userMapper.mapUserResponse(rs);
+                    } catch (SQLException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
 
-                if (user == null) {
-                    user = userMapper.mapUserResponse(rs);
-                    map.put(id, user);
+                String role = rs.getString("role");
+                if (role != null) {
+                    roleById.computeIfAbsent(id, k -> new HashSet<>())
+                        .add(UserRole.valueOf(role));
                 }
-
-                user.setUserRole(new HashSet<>());
-                user.getUserRole().add(UserRole.valueOf(rs.getString("role")));
             }
-            return new ArrayList<>(map.values());
+            return userById.entrySet().stream()
+                .map(e -> e.getValue().withRoles(
+                    roleById.getOrDefault(e.getKey(), Set.of())))
+                    .toList();
         });
     }
 
@@ -70,9 +81,7 @@ public class UserRepository {
 
         UserResponse user  = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> userMapper.mapUserResponse(rs), id);
 
-        user.setUserRole(findRolesByUserId(user.getId()));
-
-        return user;
+        return user.withRoles(findRolesByUserId(user.id()));
     }
 
     public UserResponse getByUsernameForResponse(@NonNull String username){        
@@ -84,9 +93,7 @@ public class UserRepository {
        
         UserResponse user = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> userMapper.mapUserResponse(rs), username);
 
-        user.setUserRole(findRolesByUserId(user.getId()));
-
-        return user;
+        return user.withRoles(findRolesByUserId(user.id()));
     }
 
     public Optional<User> getByUsername(@NonNull String username){        
@@ -122,7 +129,7 @@ public class UserRepository {
     }
 
 
-    public UserResponse create(UserRequestCreate userCreateDTO) {
+    public UserResponse create(UserRequestCreate userCreateDTO, String hashPassword) {
         String sql = """
                 INSERT INTO users(username, email, name, lastname, born_is, phone, password, is_active, description)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -131,7 +138,7 @@ public class UserRepository {
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        jdbcTemplate.update(connection -> userMapper.mapUserStatement(connection, userCreateDTO, sql), keyHolder);
+        jdbcTemplate.update(connection -> userMapper.mapUserStatement(connection, userCreateDTO, hashPassword, sql), keyHolder);
 
         long id = keyHolder.getKey().intValue();
             
@@ -152,8 +159,8 @@ public class UserRepository {
                 WHERE id = ?
                 """;
 
-        jdbcTemplate.update(sql, updateDTO.getName(), updateDTO.getEmail(), updateDTO.getLastname(), 
-            updateDTO.getBornIs(), updateDTO.getPhone(),updateDTO.getDescription(), id);
+        jdbcTemplate.update(sql, updateDTO.lastname(), updateDTO.email(), updateDTO.lastname(), 
+            updateDTO.bornIs(), updateDTO.phone(),updateDTO.description(), id);
 
         return getById(id);
     }

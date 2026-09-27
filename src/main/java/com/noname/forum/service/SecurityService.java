@@ -22,9 +22,8 @@ public class SecurityService implements UserDetailsService {
 
 
     public UserResponse register(UserRequestCreate userCreateDTO) {
-        String hashPassword = passwordEncoder.encode(userCreateDTO.getPassword());
-        userCreateDTO.setPassword(hashPassword);
-        UserResponse user = repository.create(userCreateDTO);
+        String hashPassword = passwordEncoder.encode(userCreateDTO.password());
+        UserResponse user = repository.create(userCreateDTO, hashPassword);
         return user;
     }
 
