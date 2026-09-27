@@ -1,4 +1,4 @@
-package com.noname.forum.repository.security.config;
+package com.noname.forum.security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.noname.forum.repository.security.filter.JwtFilter;
+import com.noname.forum.security.filter.JwtFilter;
 
 @Configuration 
 @EnableWebSecurity 

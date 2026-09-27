@@ -11,7 +11,7 @@ import com.noname.forum.domain.User;
 import com.noname.forum.dto.jwt.JwtRequest;
 import com.noname.forum.dto.jwt.JwtResponse;
 import com.noname.forum.repository.UserRepository;
-import com.noname.forum.repository.security.provider.JwtProvider;
+import com.noname.forum.security.provider.JwtProvider;
 
 import io.jsonwebtoken.Claims;
 import jakarta.security.auth.message.AuthException;

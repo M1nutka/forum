@@ -1,4 +1,4 @@
-package com.noname.forum.repository.security.provider;
+package com.noname.forum.security.provider;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
