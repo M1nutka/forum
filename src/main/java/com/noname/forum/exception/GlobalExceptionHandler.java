@@ -1,4 +1,4 @@
-package com.noname.forum.exeption;
+package com.noname.forum.exception;
 
 import java.time.LocalDateTime;
 
@@ -13,7 +13,7 @@ import com.noname.forum.controller.AuthController;
 import com.noname.forum.dto.error.ErrorResponse;
 
 @ControllerAdvice 
-public class GlobalExeptionHandler {
+public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(AuthController.class);
     

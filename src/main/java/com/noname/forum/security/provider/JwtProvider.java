@@ -10,7 +10,7 @@ import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.noname.forum.domain.User;
+import com.noname.forum.dto.user.UserCredentials;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -38,26 +38,25 @@ public class JwtProvider {
         this.jwtRefreshSecret = Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtRefreshSecret));
     }
 
-    public String generateAccessToken(@NonNull User user) {
+    public String generateAccessToken(@NonNull UserCredentials user) {
         final LocalDateTime now = LocalDateTime.now();
         final Instant accessExpirationInstant = now.plusMinutes(5).atZone(ZoneId.systemDefault()).toInstant();
         final Date accessExpiration = Date.from(accessExpirationInstant);
 
         return Jwts.builder()
-                .subject(user.getUsername())
+                .subject(user.username())
                 .expiration(accessExpiration)
                 .signWith(jwtAccessSecret)
-                .claim("roles", user.getUserRole())
                 .compact();
     }
 
-    public  String generateRefreshToken(@NonNull User user){
+    public  String generateRefreshToken(@NonNull UserCredentials user){
         final LocalDateTime now = LocalDateTime.now();
         final Instant accessExpirationInstant = now.plusDays(30).atZone(ZoneId.systemDefault()).toInstant();
         final Date accessExpiration = Date.from(accessExpirationInstant);
 
         return Jwts.builder()
-                .subject(user.getUsername())
+                .subject(user.username())
                 .expiration(accessExpiration)
                 .signWith(jwtRefreshSecret)
                 .compact();

@@ -3,55 +3,59 @@ package com.noname.forum.service;
 import java.util.List;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.noname.forum.controller.AuthController;
 import com.noname.forum.domain.User;
 import com.noname.forum.dto.user.UserRequestUpdate;
 import com.noname.forum.dto.user.UserResponse;
+import com.noname.forum.exception.UserNotFoundException;
 import com.noname.forum.repository.UserRepository;
 
-@Service
-public class UserService {
+import lombok.RequiredArgsConstructor;
 
-    private static final Logger log = LoggerFactory.getLogger(AuthController.class);
+@Service
+@RequiredArgsConstructor 
+public class UserService {
 
     private final UserRepository userRepository;
 
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
     public List<UserResponse> getAllUser(){
-        log.info("Get all users");
-        return userRepository.getAll();
+        
+        return userRepository.findAll().stream()
+            .map(UserResponse::from)
+            .toList();
     }
 
     public UserResponse getUserById(Long id){
-        log.info("Get user by id = " + id);
-        return  userRepository.getById(id);
+        return userRepository.findById(id)
+            .map(UserResponse::from)
+            .orElseThrow(() -> new UserNotFoundException(id));
     }
 
-    public UserResponse updateUser(Long id, UserRequestUpdate updateDTO){
-        log.info("Update user " + id);
-        return userRepository.update(id, updateDTO);
+    public UserResponse updateUser(Long id, UserRequestUpdate updateRequest){
+        User user = new User();
+        user.setId(id);
+        user.setEmail(updateRequest.email());
+        user.setName(updateRequest.name());
+        user.setLastname(updateRequest.lastname());
+        user.setBornIs(updateRequest.bornIs());
+        user.setPhone(updateRequest.phone());
+        user.setDescription(updateRequest.description());
+        userRepository.update(user);
+        return UserResponse.from(user);
     }
 
     public void deleteUser(Long id){
-        log.info("Delete user " + id);
         userRepository.delete(id);
     } 
 
     public Optional<User> getByUsername(String username) {
-        log.info("Get user by username = " + username);
-        return userRepository.getByUsername(username);
+        return userRepository.findByUsername(username)
+            ;
     }
 
     public UserResponse getByUsernameForResponse(String username) {
-        log.info("Get user by username = " + username);
-        return userRepository.getByUsernameForResponse(username);
+        return UserResponse.from(userRepository.findByUsername(username).get());
     }
 
 }

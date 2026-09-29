@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.noname.forum.domain.User;
 import com.noname.forum.dto.jwt.JwtRequest;
 import com.noname.forum.dto.jwt.JwtResponse;
+import com.noname.forum.dto.user.UserCredentials;
 import com.noname.forum.repository.UserRepository;
 import com.noname.forum.security.provider.JwtProvider;
 
@@ -30,12 +31,12 @@ public class AuthService {
 
 
     public JwtResponse login(@NonNull JwtRequest authRequest) throws AuthException{
-        final User user = userRepository.getByUsername(authRequest.getLogin())
+        final UserCredentials user = userRepository.findByUsernameCredentials(authRequest.getLogin())
             .orElseThrow(() -> new AuthException("Пользователь не найден"));
-        if (passwordEncoder.matches(authRequest.getPassword(), user.getPassword())){
+        if (passwordEncoder.matches(authRequest.getPassword(), user.passwordHash())){
             final String accessToken = jwtProvider.generateAccessToken(user);
             final String refreshToken = jwtProvider.generateRefreshToken(user);
-            refreshStorage.put(user.getUsername(), refreshToken);
+            refreshStorage.put(user.username(), refreshToken);
 
             return new JwtResponse(accessToken, refreshToken);
         } else {
@@ -50,11 +51,11 @@ public class AuthService {
             final String saveRefreshToken = refreshStorage.get(login);
             
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)){
-                final User user = userRepository.getByUsername(login)
+                final UserCredentials user = userRepository.findByUsernameCredentials(login)
                     .orElseThrow(() -> new AuthException("User not found"));
                 final String accessToken = jwtProvider.generateAccessToken(user);
                 final String newRefreshToken = jwtProvider.generateRefreshToken(user);
-                refreshStorage.put(user.getUsername(), newRefreshToken);
+                refreshStorage.put(user.username(), newRefreshToken);
                 return new JwtResponse(accessToken, newRefreshToken);
             }
         }
@@ -68,7 +69,7 @@ public class AuthService {
             final String login = claims.getSubject();
             final String saveRefreshToken = refreshStorage.get(login);
             if (saveRefreshToken != null && saveRefreshToken.equals(refreshToken)) {
-                final User user = userRepository.getByUsername(login)
+                final UserCredentials user = userRepository.findByUsernameCredentials(login)
                     .orElseThrow(() -> new AuthException("User not found"));
                 final String accessToken = jwtProvider.generateAccessToken(user);
                 final String newRefreshToken = jwtProvider.generateRefreshToken(user);
