@@ -50,8 +50,7 @@ public class UserService {
     } 
 
     public Optional<User> getByUsername(String username) {
-        return userRepository.findByUsername(username)
-            ;
+        return userRepository.findByUsername(username);
     }
 
     public UserResponse getByUsernameForResponse(String username) {

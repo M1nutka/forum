@@ -1,9 +1,7 @@
 package com.noname.forum.repository;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -74,11 +72,11 @@ public class UserRepository {
 
     private static final String INSERT_USER_ROLE = """
                 INSERT INTO userroles (user_id, role_id)
-                VALUES (?, 1)
+                VALUES (?, ?)
                 """;
 
-    private static final String SELECT_ALL_ROLES = """
-            SELECT id, role from roles
+    private static final String SELECT_ROLE_ID_BY_NAME = """
+            SELECT id from roles WHERE role = ?
             """;
 
     private static final String UPDATE = """
@@ -138,27 +136,16 @@ public class UserRepository {
             user.getUsername(), user.getEmail(), user.getName(), user.getLastname(), user.getBornIs(),
             user.getPhone(), user.getPassword(), user.getIsActive(), user.getDescription());
         user.setId(id);
-
-        Map<String, Long> roleIds = jdbcTemplate.query(
-            SELECT_ALL_ROLES,
-            rs -> {
-                Map<String, Long> map = new HashMap<>();
-                while (rs.next()) {
-                    map.put(rs.getString("role"), rs.getLong("id"));
-                }
-                return map;
-            }
-        );
-
-        for (UserRole role : user.getUserRole()){
-            Long roleId = roleIds.get(role.name());
-            if (roleId == null) {
-                throw new IllegalStateException("Role not found in DB id = " + roleId);
-            }
-            jdbcTemplate.update(INSERT_USER_ROLE, id, roleId);
-        }
-
         return user;
+    }
+
+    public void assignRoles(Long userId, Long roleId){
+        jdbcTemplate.update(INSERT_USER_ROLE, userId, roleId);
+    }
+
+    public Optional<Long> findRoleIdByName(String roleName) {
+        return jdbcTemplate.queryForList(SELECT_ROLE_ID_BY_NAME, Long.class, roleName
+        ).stream().findFirst();
     }
 
     public void  update(User user){

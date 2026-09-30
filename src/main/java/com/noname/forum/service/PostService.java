@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.noname.forum.domain.Post;
 import com.noname.forum.domain.User;
@@ -25,7 +26,7 @@ public class PostService {
     }
 
     public PostResponse getPost(Long id){
-        return PostResponse.from(postRepository.findPostId(id));
+        return PostResponse.from(postRepository.findPostId(id).get());
     }
 
     public PostResponse createPost(PostRequest request, Long authorId) {
@@ -40,8 +41,9 @@ public class PostService {
         return PostResponse.from(postRepository.createPost(postCreate));
     }
 
+    @Transactional 
     public PostResponse updatePost(PostRequest request, Long id, Long userId) throws AccessDeniedException {
-         // TODO: Добавть проверку на админа
+
         if (postRepository.isAuthorPost(id) != userId) {
             throw new AccessDeniedException("User is not author post");
         }
@@ -51,18 +53,18 @@ public class PostService {
         postUpdate.setDescription(request.description());
         postUpdate.setId(id);
 
-        return PostResponse.from(postRepository.updatePost(postUpdate));
+        postRepository.updatePost(postUpdate);
+
+        return PostResponse.from(postRepository.findPostId(postUpdate.getId()).get());
     }
 
     public void deletePost(Long id, Long userId) {
-         // TODO: Добавть проверку на админа
         if (postRepository.isAuthorPost(id) != userId) {
             throw new AccessDeniedException("User is not author post");
         }
         
         Post postDelete = new Post();
         postDelete.setId(id);
-
         postRepository.deletePost(postDelete);
     }
 }

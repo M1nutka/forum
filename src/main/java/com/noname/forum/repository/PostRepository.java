@@ -2,7 +2,9 @@ package com.noname.forum.repository;
 
 
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -53,9 +55,13 @@ public class PostRepository {
         return posts;
     }
 
-    public Post findPostId(long id) {
-        Post post = jdbcTemplate.queryForObject(SELECT_ALL + " WHERE p.id = ?", postRowMapper, id);
-        return post;
+    public Optional<Post> findPostId(long id) {
+        try {
+            Post post = jdbcTemplate.queryForObject(SELECT_ALL + " WHERE p.id = ?", postRowMapper, id);
+            return Optional.of(post);
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     public Post createPost(Post post){
@@ -75,9 +81,8 @@ public class PostRepository {
         return jdbcTemplate.queryForObject(IS_AUTHOR, Long.class, id); 
     }
 
-    public Post updatePost(Post post) { 
+    public void updatePost(Post post) { 
         jdbcTemplate.update(UPDATE, post.getTitle(), post.getDescription(), post.getId());
-        return post;
     }
 
     public void deletePost(Post post) {

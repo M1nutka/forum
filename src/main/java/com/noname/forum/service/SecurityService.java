@@ -6,11 +6,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.noname.forum.domain.User;
 import com.noname.forum.domain.UserRole;
 import com.noname.forum.dto.user.UserRequestCreate;
 import com.noname.forum.dto.user.UserResponse;
+import com.noname.forum.exception.RoleNotFoundException;
 import com.noname.forum.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -22,9 +24,10 @@ public class SecurityService implements UserDetailsService {
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
 
-
+    @Transactional 
     public UserResponse register(UserRequestCreate userCreateCommands) {
         String hashPassword = passwordEncoder.encode(userCreateCommands.password());
+
         User userCreate = new User();
         userCreate.setUsername(userCreateCommands.username());
         userCreate.setEmail(userCreateCommands.email());
@@ -36,7 +39,14 @@ public class SecurityService implements UserDetailsService {
         userCreate.setIsActive(true);
         userCreate.setDescription(userCreateCommands.description());
         userCreate.setUserRole(Set.of(UserRole.USER));
+
         User user = repository.create(userCreate);
+
+        for (UserRole role : userCreate.getUserRole()){
+            Long roleId = repository.findRoleIdByName(role.name())
+                .orElseThrow(() -> new RoleNotFoundException(role.name()));  
+            repository.assignRoles(userCreate.getId(), roleId); 
+        }
         return UserResponse.from(user);
     }
 

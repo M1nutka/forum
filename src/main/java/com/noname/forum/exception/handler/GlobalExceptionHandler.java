@@ -1,4 +1,4 @@
-package com.noname.forum.exception;
+package com.noname.forum.exception.handler;
 
 import java.time.LocalDateTime;
 
