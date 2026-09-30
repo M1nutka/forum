@@ -6,9 +6,9 @@ import com.noname.forum.dto.user.UserRequestUpdate;
 
 public class UserRequestUpdateFixture {
     
-        public static UserRequestUpdate defaultRequestCreate() {
-        return new UserRequestUpdate("ogurchik@gmail.com",
-            "Rick", "Sanches", LocalDate.of(1988, 12, 21),
-            "+78889997766", "I am Ogurchik Rick");
+        public static UserRequestUpdate defaultRequestUpdate() {
+        return new UserRequestUpdate("test@gmail.com",
+            "Nill", "Amstrong", LocalDate.of(1934,12,12),
+            "+45556667788", "I am Nill Amstrong");
     }
 }

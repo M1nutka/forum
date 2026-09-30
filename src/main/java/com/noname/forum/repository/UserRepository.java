@@ -148,7 +148,7 @@ public class UserRepository {
         ).stream().findFirst();
     }
 
-    public void  update(User user){
+    public void update(User user){
         jdbcTemplate.update(UPDATE, user.getLastname(), user.getEmail(), user.getLastname(), 
             user.getBornIs(), user.getPhone(),user.getDescription(), user.getId());
     }
