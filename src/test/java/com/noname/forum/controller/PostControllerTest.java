@@ -12,10 +12,10 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -23,13 +23,13 @@ import com.noname.forum.dto.post.PostResponse;
 import com.noname.forum.fixture.PostResponseFixture;
 import com.noname.forum.service.PostService;
 
-@WebMvcTest (MockitoExtension.class)
+@ExtendWith (MockitoExtension.class)
 public class PostControllerTest {
     
     @Mock 
     private PostService postService;
 
-    @MockitoBean 
+    @InjectMocks  
     private PostController postController;
 
     private MockMvc mockMvc;
