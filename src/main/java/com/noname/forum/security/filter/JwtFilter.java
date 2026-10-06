@@ -20,7 +20,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.var;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j 
@@ -40,7 +39,7 @@ public class JwtFilter extends  OncePerRequestFilter{
             final Claims claims = jwtProvider.getAccessClaims(token);
             String username = claims.getSubject();
             Optional<User> user = userService.getByUsername(username);
-            var authentication = new UsernamePasswordAuthenticationToken(
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                 (Long) user.get().getId(),
                 null,
                 user.get().getAuthorities()
