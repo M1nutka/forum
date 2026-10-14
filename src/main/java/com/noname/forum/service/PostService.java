@@ -10,6 +10,7 @@ import com.noname.forum.domain.Post;
 import com.noname.forum.domain.User;
 import com.noname.forum.dto.post.PostRequest;
 import com.noname.forum.dto.post.PostResponse;
+import com.noname.forum.exception.PostNotFoundException;
 import com.noname.forum.repository.PostRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,9 @@ public class PostService {
     }
 
     public PostResponse getPost(Long id){
-        return PostResponse.from(postRepository.findPostId(id).get());
+        return postRepository.findPostId(id)
+            .map(PostResponse::from)
+            .orElseThrow(() -> new PostNotFoundException(id));
     }
 
     public PostResponse createPost(PostRequest request, Long authorId) {
