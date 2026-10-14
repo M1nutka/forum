@@ -47,12 +47,13 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getByUsernameForResponse(username));
     }
     
-
+    // TODO: add logic where user update self account
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> userUpdate(@PathVariable Long id, @RequestBody @Valid  UserRequestUpdate updateDTO) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(id, updateDTO));
     }
     
+    // TODO: add logic where user remove self account
     @DeleteMapping("/{id}")
     public ResponseEntity<?> userRemove(@PathVariable Long id){
         userService.deleteUser(id);

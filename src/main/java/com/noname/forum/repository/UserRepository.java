@@ -153,6 +153,7 @@ public class UserRepository {
             user.getBornIs(), user.getPhone(),user.getDescription(), user.getId());
     }
 
+    // TODO: add logic where user remove self account
     public void delete(Long id){
         jdbcTemplate.update(DELETE, id);
     }
