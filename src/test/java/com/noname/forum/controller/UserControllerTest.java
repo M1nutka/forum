@@ -28,6 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.noname.forum.dto.user.UserRequestUpdate;
 import com.noname.forum.dto.user.UserResponse;
+import com.noname.forum.exception.UserNotFoundException;
 import com.noname.forum.fixture.UserRequestUpdateFixture;
 import com.noname.forum.fixture.UserResponseFixture;
 import com.noname.forum.service.UserService;
@@ -85,6 +86,19 @@ public class UserControllerTest {
     }
 
     @Test 
+    void whenUserIdDoesNotExistTest() throws Exception {
+        UserResponse user = UserResponseFixture.defaultUser();
+
+        when(userService.getUserById(user.id()))
+            .thenThrow(UserNotFoundException.class);
+        
+        mockMvc.perform(get("/users/{id}", user.id()))
+            .andExpect(status().isNotFound());
+
+        verify(userService, times(1)).getUserById(user.id());
+    }
+
+    @Test 
     void getUserByUsernameTest() throws Exception {
         UserResponse user = UserResponseFixture.defaultUser();
 
@@ -99,7 +113,20 @@ public class UserControllerTest {
     }
 
     @Test 
-    void userUpdate() throws Exception {
+    void whenyUsernameDoesNotExistTest() throws Exception {
+        UserResponse user = UserResponseFixture.defaultUser();
+
+        when(userService.getByUsernameForResponse(user.username()))
+            .thenThrow(UserNotFoundException.class);
+        
+        mockMvc.perform(get("/users/username/{username}", user.username()))
+            .andExpect(status().isNotFound());
+
+        verify(userService, times(1)).getByUsernameForResponse(user.username());
+    }
+
+    @Test 
+    void userUpdateTest() throws Exception {
         Long userId = 1L;
         UserRequestUpdate inputDTO = UserRequestUpdateFixture.defaultRequestUpdate();
         UserResponse updatedDTO = UserResponseFixture.defaultUser();
@@ -118,6 +145,23 @@ public class UserControllerTest {
     }
 
     @Test 
+    void whenUserIdDoesNotExistUpdateTest() throws Exception {
+        Long userId = 1L;
+        UserRequestUpdate inputDTO = UserRequestUpdateFixture.defaultRequestUpdate();
+
+        Mockito.when(userService.updateUser(Mockito.eq(userId), Mockito.any(UserRequestUpdate.class)))
+            .thenThrow(UserNotFoundException.class);
+
+        mockMvc.perform(put("/users/{id}", userId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(inputDTO)))
+            .andExpect(status().isNotFound());
+
+        verify(userService, times(1)).updateUser(userId, inputDTO);
+    }
+
+    // TODO: add test if user no auth
+    @Test 
     void userRemoveTest() throws Exception {
         Long userId = 1L;
         
@@ -128,4 +172,6 @@ public class UserControllerTest {
 
         verify(userService, times(1)).deleteUser(userId);
     }
+
+    
 }

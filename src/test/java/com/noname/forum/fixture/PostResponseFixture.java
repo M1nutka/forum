@@ -13,7 +13,7 @@ public class PostResponseFixture {
             "My first post!",
             "Tu tu ru",
             LocalDateTime.of(2026, 2, 20, 1, 1),
-            new AuthorResponse(1L, "Cubs")
+            new AuthorResponse(1L, "NiAl")
         );
     }
 
@@ -23,7 +23,7 @@ public class PostResponseFixture {
             "key title",
             "my second post",
             LocalDateTime.of(2026, 2, 22, 2, 2),
-            new AuthorResponse(2L, "Yoyyo")
+            new AuthorResponse(2L, "admin")
         );
     }
 }

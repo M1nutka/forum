@@ -2,9 +2,12 @@ package com.noname.forum.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -20,6 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.noname.forum.domain.User;
 import com.noname.forum.dto.user.UserRequestUpdate;
 import com.noname.forum.dto.user.UserResponse;
+import com.noname.forum.exception.UserNotFoundException;
 import com.noname.forum.fixture.UserFixture;
 import com.noname.forum.fixture.UserRequestUpdateFixture;
 import com.noname.forum.repository.UserRepository;
@@ -65,6 +69,22 @@ public class UserServiceTest {
         assertEquals("NiAl", result.username());
 
         verify(userRepository, times(1)).findById(user.getId());
+    }
+
+    @Test 
+    void whenUserIdDoesNotExistTest() throws Exception {
+        User user = UserFixture.defaultUser();
+            
+        when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
+
+        assertThrows(
+            UserNotFoundException.class,
+            () -> userService.getUserById(user.getId())
+        );
+
+        verify(userRepository, times(1)).findById(user.getId());
+        verifyNoInteractions(userService);
+        verifyNoMoreInteractions(userRepository);
     }
 
 
