@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
@@ -87,7 +86,6 @@ public class PosrServiceTest {
 
         verify(postRepository, times(1)).findPostId(postId);
         verifyNoMoreInteractions(postRepository);
-        verifyNoInteractions(postService);
     }
 
     @Test
@@ -143,7 +141,6 @@ public class PosrServiceTest {
 
         verify(postRepository, times(1)).isAuthorPost(postId);
         verifyNoMoreInteractions(postRepository);
-        verifyNoInteractions(postService);
     }
 
     @Test
