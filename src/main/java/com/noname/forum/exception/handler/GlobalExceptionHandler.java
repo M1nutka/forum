@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.noname.forum.controller.AuthController;
 import com.noname.forum.dto.error.ErrorResponse;
+import com.noname.forum.exception.PostNotFoundException;
 
 @ControllerAdvice 
 public class GlobalExceptionHandler {
@@ -30,6 +31,20 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
+
+
+    @ExceptionHandler (PostNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handlerPostNotFound(PostNotFoundException ex){
+        log.error("PostNotFound exeption, " + ex.getMessage());
+
+        ErrorResponse response = new ErrorResponse(
+            "Post not found",
+            ex.getMessage(),
+            LocalDateTime.now()
+        );
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    } 
 
     
 }
