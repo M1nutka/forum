@@ -20,7 +20,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.noname.forum.dto.post.PostResponse;
-// import com.noname.forum.exception.PostNotFoundException;
 import com.noname.forum.fixture.PostResponseFixture;
 import com.noname.forum.service.PostService;
 
@@ -69,18 +68,5 @@ public class PostControllerTest {
 
         verify(postService, times(1)).getPost(post.id());
     }
-
-    // @Test
-    // void whenPostIdDoesNotExistTest() throws Exception{
-    //     PostResponse post = PostResponseFixture.defaultPostResponse1();
-
-    //     when(postService.getPost(post.id()))
-    //         .thenThrow(PostNotFoundException.class);
-
-    //     mockMvc.perform(get("/posts/{id}", post.id()))
-    //         .andExpect(status().isNotFound());
-
-    //     verify(postService, times(1)).getPost(post.id());
-    // }
 
 }

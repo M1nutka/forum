@@ -29,7 +29,7 @@ import com.noname.forum.fixture.PostFixture;
 import com.noname.forum.fixture.PostRequestFixture;
 import com.noname.forum.repository.PostRepository;
 @ExtendWith (MockitoExtension.class)
-public class PosrServiceTest {
+public class PostServiceTest {
     
     @Mock 
     private PostRepository postRepository;
