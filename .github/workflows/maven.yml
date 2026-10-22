@@ -33,9 +33,3 @@ jobs:
         JWT_SECRET_REFRESH: "testrefreshsecrettestrefreshsecrettestrefreshsecret123"
         TESTCONTAINERS_RYUK_DISABLED: true
       run: mvn -B clean verify
-
-    - name: Show test reports on failure
-      if: failure()
-      run: |
-        echo "=== FAILSAFE REPORTS ==="
-        find target/failsafe-reports -name "*.txt" -exec cat {} \;
