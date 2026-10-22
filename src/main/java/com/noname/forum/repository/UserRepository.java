@@ -89,6 +89,10 @@ public class UserRepository {
                 DELETE FROM users
                 WHERE id = ?
                 """;
+
+    private static final String DELETE_ALL = "DELETE FROM users";
+    private static final String DELETE_ALL_USERROLES = "DELETE FROM userroles";
+    private static final String DELETE_ALL_POSTS = "DELETE FROM posts";
      
     public List<User> findAll(){
         return jdbcTemplate.query(SELECT_ALL, userListExtractor);
@@ -156,6 +160,12 @@ public class UserRepository {
     // TODO: add logic where user remove self account
     public void delete(Long id){
         jdbcTemplate.update(DELETE, id);
+    }
+
+    public void deleteAll(){
+        jdbcTemplate.update(DELETE_ALL_USERROLES);
+        jdbcTemplate.update(DELETE_ALL_POSTS);
+        jdbcTemplate.update(DELETE_ALL);
     }
 }
 
