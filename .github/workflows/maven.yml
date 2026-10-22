@@ -29,8 +29,8 @@ jobs:
         cache: maven
     - name: Build with Maven
       env:
-        JWT_SECRET_ACCESS: "testaccesssecrettestaccesssecrettest"
-        JWT_SECRET_REFRESH: "testrefreshsecrettestrefreshsecrettest"
+        JWT_SECRET_ACCESS: "testaccesssecrettestaccesssecrettestaccesssecret123"
+        JWT_SECRET_REFRESH: "testrefreshsecrettestrefreshsecrettestrefreshsecret123"
         TESTCONTAINERS_RYUK_DISABLED: true
       run: mvn -B clean verify
 
