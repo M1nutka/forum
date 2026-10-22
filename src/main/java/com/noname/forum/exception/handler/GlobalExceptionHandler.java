@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import com.noname.forum.controller.AuthController;
 import com.noname.forum.dto.error.ErrorResponse;
 import com.noname.forum.exception.PostNotFoundException;
+import com.noname.forum.exception.UserNotFoundException;
+import com.noname.forum.exception.UsernameNotFoundException;
 
 @ControllerAdvice 
 public class GlobalExceptionHandler {
@@ -39,6 +41,32 @@ public class GlobalExceptionHandler {
 
         ErrorResponse response = new ErrorResponse(
             "Post not found",
+            ex.getMessage(),
+            LocalDateTime.now()
+        );
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    } 
+
+    @ExceptionHandler (UserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handlerUserNotFound(UserNotFoundException ex){
+        log.error("UserNotFound exeption, " + ex.getMessage());
+
+        ErrorResponse response = new ErrorResponse(
+            "User not found",
+            ex.getMessage(),
+            LocalDateTime.now()
+        );
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    } 
+
+    @ExceptionHandler (UsernameNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handlerUsernameNotFound(UsernameNotFoundException ex){
+        log.error("UsernameNotFound exeption, " + ex.getMessage());
+
+        ErrorResponse response = new ErrorResponse(
+            "User not found",
             ex.getMessage(),
             LocalDateTime.now()
         );
