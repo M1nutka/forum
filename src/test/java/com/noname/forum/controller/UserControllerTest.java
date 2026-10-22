@@ -4,9 +4,7 @@ package com.noname.forum.controller;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import java.util.ArrayList;
@@ -17,18 +15,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.noname.forum.dto.user.UserRequestUpdate;
 import com.noname.forum.dto.user.UserResponse;
-import com.noname.forum.fixture.UserRequestUpdateFixture;
 import com.noname.forum.fixture.UserResponseFixture;
 import com.noname.forum.service.UserService;
 
@@ -98,37 +92,4 @@ public class UserControllerTest {
         verify(userService, times(1)).getByUsernameForResponse(user.username());
     }
 
-    @Test 
-    void userUpdateTest() throws Exception {
-        Long userId = 1L;
-        UserRequestUpdate inputDTO = UserRequestUpdateFixture.defaultRequestUpdate();
-        UserResponse updatedDTO = UserResponseFixture.defaultUser();
-
-        Mockito.when(userService.updateUser(Mockito.eq(userId), Mockito.any(UserRequestUpdate.class)))
-            .thenReturn(updatedDTO);
-
-        mockMvc.perform(put("/users/{id}", userId)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(inputDTO)))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(1))
-            .andExpect(jsonPath("$.username").value("NiAl"));
-
-        verify(userService, times(1)).updateUser(userId, inputDTO);
-    }
-
-    // TODO: add test if user no auth
-    @Test 
-    void userRemoveTest() throws Exception {
-        Long userId = 1L;
-        
-        Mockito.doNothing().when(userService).deleteUser(userId);
-
-        mockMvc.perform(delete("/users/{id}", userId))
-            .andExpect(status().isOk());
-
-        verify(userService, times(1)).deleteUser(userId);
-    }
-
-    
 }

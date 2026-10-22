@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,7 +34,7 @@ public class UserController {
     
     @GetMapping
     public ResponseEntity<List<UserResponse>> getAllUser() {
-        log.info("Get all users, controller");
+        log.info("Get all users");
         return ResponseEntity.status(HttpStatus.OK).body(userService.getAllUser());
     }
 
@@ -47,16 +48,14 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getByUsernameForResponse(username));
     }
     
-    // TODO: add logic where user update self account
-    @PutMapping("/{id}")
-    public ResponseEntity<UserResponse> userUpdate(@PathVariable Long id, @RequestBody @Valid  UserRequestUpdate updateDTO) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(id, updateDTO));
+    @PutMapping
+    public ResponseEntity<UserResponse> userUpdate(@AuthenticationPrincipal Long userId, @RequestBody @Valid  UserRequestUpdate updateDTO) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(userId, updateDTO));
     }
-    
-    // TODO: add logic where user remove self account
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> userRemove(@PathVariable Long id){
-        userService.deleteUser(id);
+     
+    @DeleteMapping
+    public ResponseEntity<?> userRemove(@AuthenticationPrincipal Long userId){
+        userService.deleteUser(userId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

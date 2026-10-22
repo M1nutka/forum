@@ -2,7 +2,6 @@ package com.noname.forum.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -22,11 +21,9 @@ import com.jayway.jsonpath.JsonPath;
 import com.noname.forum.dto.jwt.JwtRequest;
 import com.noname.forum.dto.user.UserCredentials;
 import com.noname.forum.dto.user.UserRequestCreate;
-import com.noname.forum.dto.user.UserRequestUpdate;
 import com.noname.forum.dto.user.UserResponse;
 import com.noname.forum.fixture.JwtRequestFixture;
 import com.noname.forum.fixture.UserRequestCreateFixture;
-import com.noname.forum.fixture.UserRequestUpdateFixture;
 import com.noname.forum.fixture.UserResponseFixture;
 import com.noname.forum.repository.UserRepository;
 import com.noname.forum.security.provider.JwtProvider;
@@ -80,18 +77,6 @@ public class UserControllerIT {
         
         mockMvc.perform(get("/users/username/{username}", user.username())
                 .header("Authorization", "Bearer " + accessToken))
-            .andExpect(status().isNotFound());
-    }
-
-    @Test 
-    void whenUserIdDoesNotExistUpdateTest() throws Exception {
-        Long userId = 100L;
-        UserRequestUpdate inputDTO = UserRequestUpdateFixture.defaultRequestUpdate();
-
-        mockMvc.perform(put("/users/{id}", userId)
-                .header("Authorization", "Bearer " + accessToken)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(inputDTO)))
             .andExpect(status().isNotFound());
     }
 

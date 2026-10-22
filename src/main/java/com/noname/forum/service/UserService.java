@@ -52,9 +52,8 @@ public class UserService {
         return UserResponse.from(user);
     }
 
-    // TODO: add logic where user remove self account
-    public void deleteUser(Long id){
-        userRepository.delete(id);
+    public void deleteUser(Long userId){
+        userRepository.delete(userId);
     } 
 
     public Optional<User> getByUsername(String username) {
