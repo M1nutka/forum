@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.jayway.jsonpath.JsonPath;
+import com.noname.forum.db.AbstractPostgresIT;
 import com.noname.forum.dto.jwt.JwtRequest;
 import com.noname.forum.dto.user.UserCredentials;
 import com.noname.forum.dto.user.UserRequestCreate;
@@ -37,7 +38,7 @@ import com.noname.forum.fixture.UserResponseFixture;
 @SpringBootTest 
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-public class UserControllerIT {
+public class UserControllerIT extends AbstractPostgresIT{
 
     @Autowired private MockMvc mockMvc;
     @Autowired private UserRepository userRepository;

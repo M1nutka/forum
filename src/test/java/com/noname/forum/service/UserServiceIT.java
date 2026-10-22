@@ -1,5 +1,7 @@
 package com.noname.forum.service;
 
-public class UserServiceIT {
+import com.noname.forum.db.AbstractPostgresIT;
+
+public class UserServiceIT extends AbstractPostgresIT{
     
 }
