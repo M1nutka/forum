@@ -17,4 +17,10 @@ public class UserRequestCreateFixture {
             "Morty", "Smit", LocalDate.of(2005, 12, 21),
             "+78881297766", "qwerty", "I am Morty smit");
     }
+
+    public static UserRequestCreate defaultRequestCreate3() {
+        return new UserRequestCreate("yogoooo", "yuo@gmail.com",
+            "Yogo", "neiro", LocalDate.of(2001, 12, 21),
+            "+78881297799", "qwerty", "I am AI");
+    }
 }
