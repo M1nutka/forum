@@ -12,7 +12,6 @@ import com.noname.forum.service.SecurityService;
 
 import lombok.RequiredArgsConstructor;
 
-
 @RestController 
 @RequiredArgsConstructor 
 public class RegController {
