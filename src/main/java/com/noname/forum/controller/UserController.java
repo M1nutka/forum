@@ -32,34 +32,39 @@ public class UserController {
 
     private final UserService userService;
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public ResponseEntity<List<UserResponse>> getAllUser() {
         log.info("Get all users");
         return ResponseEntity.status(HttpStatus.OK).body(userService.getAllUser());
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUser(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getUserById(id));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/username/{username}")
     public ResponseEntity<UserResponse> getUserByUsername(@PathVariable String username) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getByUsernameForResponse(username));
     }
     
+    @PreAuthorize("isAuthenticated()")
     @PutMapping
     public ResponseEntity<UserResponse> userUpdate(@AuthenticationPrincipal Long userId, @RequestBody @Valid  UserRequestUpdate updateDTO) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(userId, updateDTO));
     }
-     
+    
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping
     public ResponseEntity<?> userRemove(@AuthenticationPrincipal Long userId){
         userService.deleteUser(userId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
-    @PreAuthorize(value = "ADMIN") 
+    @PreAuthorize("hasRole('ADMIN')") 
     @DeleteMapping("/admin/{id}")
     public ResponseEntity<?> userRemoveAdmin(@PathVariable Long userId){
         userService.deleteUser(userId);
