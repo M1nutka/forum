@@ -44,7 +44,6 @@ public class UserServiceTest {
         when(userRepository.findAll()).thenReturn(users);
 
         List<UserResponse> result = userService.getAllUser();
-
         assertNotNull(result);
         assertEquals(2, result.size());
         assertEquals(1L, result.get(0).id());
@@ -62,7 +61,6 @@ public class UserServiceTest {
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
         UserResponse result = userService.getUserById(user.getId());
-        
         assertNotNull(result);
         assertEquals(1L, result.id());
         assertEquals("NiAl", result.username());
@@ -75,7 +73,6 @@ public class UserServiceTest {
         User user = UserFixture.defaultUser();
             
         when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
-
         assertThrows(
             UserNotFoundException.class,
             () -> userService.getUserById(user.getId())
@@ -89,11 +86,11 @@ public class UserServiceTest {
     @Test 
     void updateUserTest() throws Exception {
         User user = UserFixture.defaultUser();
-
         UserRequestUpdate updateDTO = UserRequestUpdateFixture.defaultRequestUpdate();
-            
+
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+    
         UserResponse result = userService.updateUser(user.getId(), updateDTO);
-        
         assertNotNull(result);
         assertEquals(1L, result.id());
         assertEquals("Nill", result.name());
