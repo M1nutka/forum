@@ -1,7 +1,9 @@
 package com.noname.forum.controller;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -21,9 +23,11 @@ import com.jayway.jsonpath.JsonPath;
 import com.noname.forum.dto.jwt.JwtRequest;
 import com.noname.forum.dto.user.UserCredentials;
 import com.noname.forum.dto.user.UserRequestCreate;
+import com.noname.forum.dto.user.UserRequestUpdate;
 import com.noname.forum.dto.user.UserResponse;
 import com.noname.forum.fixture.JwtRequestFixture;
 import com.noname.forum.fixture.UserRequestCreateFixture;
+import com.noname.forum.fixture.UserRequestUpdateFixture;
 import com.noname.forum.fixture.UserResponseFixture;
 import com.noname.forum.repository.UserRepository;
 import com.noname.forum.security.provider.JwtProvider;
@@ -63,7 +67,7 @@ public class UserControllerIT {
     }
 
     @Test 
-    void whenUserIdDoesNotExistTest() throws Exception {
+    void whenUserIdDoesNotExistIT() throws Exception {
         UserResponse user = UserResponseFixture.defaultUser();
         
         mockMvc.perform(get("/users/{id}", user.id())
@@ -72,7 +76,7 @@ public class UserControllerIT {
     }
 
     @Test 
-    void whenyUsernameDoesNotExistTest() throws Exception {
+    void whenyUsernameDoesNotExistIT() throws Exception {
         UserResponse user = UserResponseFixture.defaultUser();
         
         mockMvc.perform(get("/users/username/{username}", user.username())
@@ -81,7 +85,7 @@ public class UserControllerIT {
     }
 
     @Test 
-    void shouldCreateAndRetriveUser() throws Exception{
+    void shouldCreateAndRetriveUserIT() throws Exception{
         UserRequestCreate userRequestCreate = UserRequestCreateFixture.defaultRequestCreate2();
 
         MvcResult result = mockMvc.perform(post("/register")
@@ -111,5 +115,26 @@ public class UserControllerIT {
                 .andExpect(jsonPath("$.name").value("Morty"))
                 .andExpect(jsonPath("$.password").doesNotExist())
                 .andReturn();
+    }
+
+    @Test 
+    void updateUserIT() throws Exception{
+        UserRequestUpdate userRequestUpdate = UserRequestUpdateFixture.defaultRequestUpdate();
+
+        mockMvc.perform(put("/users")
+                .header("Authorization", "Bearer " + accessToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userRequestUpdate)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.name").value("Nill"))
+            .andReturn();
+    }
+
+    @Test 
+    void deleteUserIT() throws Exception{
+        mockMvc.perform(delete("/users")
+                .header("Authorization", "Bearer " + accessToken))
+            .andExpect(status().isOk())
+            .andReturn();
     }
 }
