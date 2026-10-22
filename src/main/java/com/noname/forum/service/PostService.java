@@ -1,6 +1,7 @@
 package com.noname.forum.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -47,6 +48,11 @@ public class PostService {
     @Transactional 
     public PostResponse updatePost(PostRequest request, Long id, Long userId) throws AccessDeniedException {
 
+        Optional<Post> post = postRepository.findPostId(id);
+        if (post.isEmpty()) {
+            throw new PostNotFoundException("Post not found where id = " + id);
+        }
+
         if (postRepository.isAuthorPost(id) != userId) {
             throw new AccessDeniedException("User is not author post");
         }
@@ -61,7 +67,13 @@ public class PostService {
         return PostResponse.from(postRepository.findPostId(postUpdate.getId()).get());
     }
 
+    @Transactional 
     public void deletePost(Long id, Long userId) {
+        Optional<Post> post = postRepository.findPostId(id);
+        if (post.isEmpty()) {
+            throw new PostNotFoundException("Post not found where id = " + id);
+        }
+
         if (postRepository.isAuthorPost(id) != userId) {
             throw new AccessDeniedException("User is not author post");
         }
