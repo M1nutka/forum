@@ -30,7 +30,7 @@ jobs:
     - name: Build with Maven
       env:
         DB_PASSWORD: postgres
-        JWT_SECRET_ACCESS: "test-access-secret-test-access-secret-test"
-        JWT_SECRET_REFRESH: "test-refresh-secret-test-refresh-secret-test"
+        JWT_SECRET_ACCESS: "VCc6hrJi4eLI2/RAgibtyrh9oj3ptTOHoVsUDPU/tcg"
+        JWT_SECRET_REFRESH: "QMDmgFb0mBV5JYwNCDUpYgf4Mdp20aeYZEsc1J3FjM"
         TESTCONTAINERS_RYUK_DISABLED: true
       run: mvn -B clean verify
