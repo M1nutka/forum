@@ -4,11 +4,13 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.noname.forum.domain.User;
 import com.noname.forum.dto.user.UserRequestUpdate;
 import com.noname.forum.dto.user.UserResponse;
 import com.noname.forum.exception.UserNotFoundException;
+import com.noname.forum.exception.UsernameNotFoundException;
 import com.noname.forum.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -32,7 +34,12 @@ public class UserService {
             .orElseThrow(() -> new UserNotFoundException(id));
     }
 
+    @Transactional 
     public UserResponse updateUser(Long id, UserRequestUpdate updateRequest){
+        Optional<User> userFound = userRepository.findById(id);
+        if (userFound.isEmpty()){
+            throw new  UserNotFoundException(id);
+        }
         User user = new User();
         user.setId(id);
         user.setEmail(updateRequest.email());
@@ -41,6 +48,7 @@ public class UserService {
         user.setBornIs(updateRequest.bornIs());
         user.setPhone(updateRequest.phone());
         user.setDescription(updateRequest.description());
+        
         userRepository.update(user);
         return UserResponse.from(user);
     }
@@ -55,7 +63,9 @@ public class UserService {
     }
 
     public UserResponse getByUsernameForResponse(String username) {
-        return UserResponse.from(userRepository.findByUsername(username).get());
+        return userRepository.findByUsername(username)
+            .map(UserResponse::from)
+            .orElseThrow(() -> new UsernameNotFoundException(username));
     }
 
 }
