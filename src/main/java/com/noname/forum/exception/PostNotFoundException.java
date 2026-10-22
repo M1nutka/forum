@@ -1,7 +1,7 @@
 package com.noname.forum.exception;
 
 public class PostNotFoundException extends RuntimeException {
-    public PostNotFoundException(Long id){
+    public PostNotFoundException(String id){
         super("Post not found, id = " + id);
     }
 }

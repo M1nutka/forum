@@ -29,7 +29,7 @@ public class PostService {
     public PostResponse getPost(Long id){
         return postRepository.findPostId(id)
             .map(PostResponse::from)
-            .orElseThrow(() -> new PostNotFoundException(id));
+            .orElseThrow(() -> new PostNotFoundException(String.valueOf(id)));
     }
 
     public PostResponse createPost(PostRequest request, Long authorId) {
