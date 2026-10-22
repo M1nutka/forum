@@ -25,13 +25,14 @@ import com.noname.forum.dto.user.UserCredentials;
 import com.noname.forum.dto.user.UserRequestCreate;
 import com.noname.forum.dto.user.UserRequestUpdate;
 import com.noname.forum.dto.user.UserResponse;
+import com.noname.forum.repository.UserRepository;
+import com.noname.forum.security.provider.JwtProvider;
+import com.noname.forum.service.SecurityService;
+
 import com.noname.forum.fixture.JwtRequestFixture;
 import com.noname.forum.fixture.UserRequestCreateFixture;
 import com.noname.forum.fixture.UserRequestUpdateFixture;
 import com.noname.forum.fixture.UserResponseFixture;
-import com.noname.forum.repository.UserRepository;
-import com.noname.forum.security.provider.JwtProvider;
-import com.noname.forum.service.SecurityService;
 
 @SpringBootTest 
 @AutoConfigureMockMvc
@@ -46,6 +47,7 @@ public class UserControllerIT {
     private ObjectMapper objectMapper;
 
     private String accessToken;
+    private UserResponse userResponse;
 
     @BeforeEach 
     void clean(){
@@ -58,12 +60,34 @@ public class UserControllerIT {
         this.objectMapper.registerModule(new JavaTimeModule());
 
         UserRequestCreate userRequestCreate = UserRequestCreateFixture.defaultRequestCreate();
-        UserResponse userResponse = securityService.register(userRequestCreate);
+        UserRequestCreate userRequestCreate2 = UserRequestCreateFixture.defaultRequestCreate2();
+        userResponse = securityService.register(userRequestCreate);
+        securityService.register(userRequestCreate2);
 
         UserCredentials userCredentials = new UserCredentials(
             userResponse.id(), userResponse.username(), userRequestCreate.password());
 
         accessToken = jwtProvider.generateAccessToken(userCredentials);
+    }
+
+    @Test 
+    void getAllUserIT() throws Exception{
+        mockMvc.perform(get("/users")
+                .header("Authorization", "Bearer " + accessToken))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].username").value("ogurchikRick"))
+            .andExpect(jsonPath("$[1].username").value("mortyyy"))
+            .andExpect(jsonPath("$").isArray());
+    }
+
+    @Test 
+    void getUserIT() throws Exception{
+
+        mockMvc.perform(get("/users/{id}", userResponse.id())
+                .header("Authorization", "Bearer " + accessToken))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.username").value("ogurchikRick"))
+            .andReturn();
     }
 
     @Test 
@@ -86,13 +110,13 @@ public class UserControllerIT {
 
     @Test 
     void shouldCreateAndRetriveUserIT() throws Exception{
-        UserRequestCreate userRequestCreate = UserRequestCreateFixture.defaultRequestCreate2();
+        UserRequestCreate userRequestCreate = UserRequestCreateFixture.defaultRequestCreate3();
 
         MvcResult result = mockMvc.perform(post("/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userRequestCreate)))
             .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.name").value("Morty"))
+            .andExpect(jsonPath("$.name").value("Yogo"))
             .andExpect(jsonPath("$.password").doesNotExist())
             .andReturn();
 
@@ -112,7 +136,7 @@ public class UserControllerIT {
         mockMvc.perform(get("/users/{id}", userId)
             .header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Morty"))
+                .andExpect(jsonPath("$.name").value("Yogo"))
                 .andExpect(jsonPath("$.password").doesNotExist())
                 .andReturn();
     }

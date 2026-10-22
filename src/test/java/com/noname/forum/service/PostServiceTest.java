@@ -25,9 +25,10 @@ import com.noname.forum.domain.Post;
 import com.noname.forum.dto.post.PostRequest;
 import com.noname.forum.dto.post.PostResponse;
 import com.noname.forum.exception.PostNotFoundException;
+import com.noname.forum.repository.PostRepository;
+
 import com.noname.forum.fixture.PostFixture;
 import com.noname.forum.fixture.PostRequestFixture;
-import com.noname.forum.repository.PostRepository;
 @ExtendWith (MockitoExtension.class)
 public class PostServiceTest {
     
@@ -122,7 +123,7 @@ public class PostServiceTest {
         assertEquals("NiAl", result.author().username());
 
         verify(postRepository, times(1)).isAuthorPost(postId);
-        verify(postRepository, times(1)).findPostId(postId);
+        verify(postRepository, times(2)).findPostId(postId);
 
     }
 
@@ -131,8 +132,10 @@ public class PostServiceTest {
         Long userId = 1L;
         Long postId = 1L;
         PostRequest postDTO = PostRequestFixture.defaultPost(); 
+        Post post = PostFixture.defaultPost1();
 
         when(postRepository.isAuthorPost(postId)).thenReturn(2L);
+        when(postRepository.findPostId(postId)).thenReturn(Optional.of(post));
 
         assertThrows(
             AccessDeniedException.class,
@@ -147,8 +150,10 @@ public class PostServiceTest {
     void deletePostTest() throws Exception{
         Long userId = 1L;
         Long postId = 1L;
+        Post post = PostFixture.defaultPost1();
 
         when(postRepository.isAuthorPost(postId)).thenReturn(userId);
+        when(postRepository.findPostId(postId)).thenReturn(Optional.of(post));
 
         postService.deletePost(postId, userId);
 
@@ -159,9 +164,11 @@ public class PostServiceTest {
     @Test
     void shouldThrowWhenNotAuthorTest() throws Exception{
         Long userId = 2L;
-        Long postId = 1L;
+        Long postId = 1L;        
+        Post post = PostFixture.defaultPost1();
 
         when(postRepository.isAuthorPost(postId)).thenReturn(1L);
+        when(postRepository.findPostId(postId)).thenReturn(Optional.of(post));
 
         assertThrows(AccessDeniedException.class,
             () -> postService.deletePost(postId, userId));

@@ -23,9 +23,10 @@ import com.noname.forum.domain.User;
 import com.noname.forum.dto.user.UserRequestUpdate;
 import com.noname.forum.dto.user.UserResponse;
 import com.noname.forum.exception.UserNotFoundException;
+import com.noname.forum.repository.UserRepository;
+
 import com.noname.forum.fixture.UserFixture;
 import com.noname.forum.fixture.UserRequestUpdateFixture;
-import com.noname.forum.repository.UserRepository;
 
 @ExtendWith (MockitoExtension.class)
 public class UserServiceTest {
