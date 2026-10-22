@@ -29,8 +29,13 @@ jobs:
         cache: maven
     - name: Build with Maven
       env:
-        DB_PASSWORD: postgres
-        JWT_SECRET_ACCESS: "VCc6hrJi4eLI2/RAgibtyrh9oj3ptTOHoVsUDPU/tcg"
-        JWT_SECRET_REFRESH: "QMDmgFb0mBV5JYwNCDUpYgf4Mdp20aeYZEsc1J3FjM"
+        JWT_SECRET_ACCESS: "testaccesssecrettestaccesssecrettest"
+        JWT_SECRET_REFRESH: "testrefreshsecrettestrefreshsecrettest"
         TESTCONTAINERS_RYUK_DISABLED: true
       run: mvn -B clean verify
+
+    - name: Show test reports on failure
+      if: failure()
+      run: |
+        echo "=== FAILSAFE REPORTS ==="
+        find target/failsafe-reports -name "*.txt" -exec cat {} \;
