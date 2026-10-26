@@ -46,7 +46,7 @@ public class PostService {
     }
 
     @Transactional 
-    public PostResponse updatePost(PostRequest request, Long id, Long userId) throws AccessDeniedException {
+    public PostResponse updatePost(PostRequest request, Long id, Long userId){
 
         Optional<Post> post = postRepository.findPostId(id);
         if (post.isEmpty()) {

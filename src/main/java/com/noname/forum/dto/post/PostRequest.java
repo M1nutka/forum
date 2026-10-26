@@ -1,6 +1,5 @@
 package com.noname.forum.dto.post;
 
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
@@ -10,7 +9,7 @@ public record PostRequest(
     String title,
 
     @NotEmpty (message = "description cannot be empty")
-    @Min (value = 5, message = "description must min 5 char")
+    @Size (min = 5, message = "description must min 5 char")
     String description
 ) {
 } 

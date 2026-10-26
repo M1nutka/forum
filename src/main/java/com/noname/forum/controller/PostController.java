@@ -7,9 +7,9 @@ import com.noname.forum.dto.post.PostRequest;
 import com.noname.forum.dto.post.PostResponse;
 import com.noname.forum.service.PostService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -51,14 +51,14 @@ public class PostController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping()
-    public ResponseEntity<PostResponse> createPost(@RequestBody PostRequest request, @AuthenticationPrincipal Long id) {
+    public ResponseEntity<PostResponse> createPost(@RequestBody @Valid  PostRequest request, @AuthenticationPrincipal Long id) {
         log.info("Create post");
         return ResponseEntity.status(HttpStatus.CREATED).body(postService.createPost(request, id));
     }
 
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}")
-    public ResponseEntity<PostResponse> putPost(@PathVariable Long id, @AuthenticationPrincipal Long userId,  @RequestBody PostRequest request) throws AccessDeniedException {
+    public ResponseEntity<PostResponse> putPost(@PathVariable Long id, @AuthenticationPrincipal Long userId,  @RequestBody @Valid  PostRequest request){
         log.info("Change post info id = " + id + ". UserId = " + userId);
         return ResponseEntity.status(HttpStatus.OK).body(postService.updatePost(request, id, userId));
     }
