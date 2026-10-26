@@ -2,15 +2,23 @@ package com.noname.forum.service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.noname.forum.domain.User;
+import com.noname.forum.domain.UserRole;
 import com.noname.forum.dto.jwt.JwtRequest;
 import com.noname.forum.dto.jwt.JwtResponse;
 import com.noname.forum.dto.user.UserCredentials;
+import com.noname.forum.dto.user.UserRequestCreate;
+import com.noname.forum.dto.user.UserResponse;
+import com.noname.forum.exception.RoleNotFoundException;
 import com.noname.forum.repository.UserRepository;
 import com.noname.forum.security.provider.JwtProvider;
 
@@ -21,14 +29,38 @@ import lombok.RequiredArgsConstructor;
 
 @Service 
 @RequiredArgsConstructor 
-public class AuthService {
+public class AuthService implements UserDetailsService{
 
     private final JwtProvider jwtProvider;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final Map<String, String> refreshStorage = new HashMap<>();
     
+    @Transactional 
+    public UserResponse register(UserRequestCreate userCreateCommands) {
+        String hashPassword = passwordEncoder.encode(userCreateCommands.password());
 
+        User userCreate = new User();
+        userCreate.setUsername(userCreateCommands.username());
+        userCreate.setEmail(userCreateCommands.email());
+        userCreate.setName(userCreateCommands.name());
+        userCreate.setLastname(userCreateCommands.lastname());
+        userCreate.setBornIs(userCreateCommands.bornIs());
+        userCreate.setPhone(userCreateCommands.phone());
+        userCreate.setPassword(hashPassword);
+        userCreate.setIsActive(true);
+        userCreate.setDescription(userCreateCommands.description());
+        userCreate.setUserRole(Set.of(UserRole.USER));
+
+        User user = userRepository.create(userCreate);
+
+        for (UserRole role : userCreate.getUserRole()){
+            Long roleId = userRepository.findRoleIdByName(role.name())
+                .orElseThrow(() -> new RoleNotFoundException(role.name()));  
+            userRepository.assignRoles(userCreate.getId(), roleId); 
+        }
+        return UserResponse.from(user);
+    }
 
     public JwtResponse login(@NonNull JwtRequest authRequest) throws AuthException{
         final UserCredentials user = userRepository.findByUsernameCredentials(authRequest.getLogin())
@@ -62,7 +94,6 @@ public class AuthService {
         throw new AuthException("unvalid token");
     }
 
-
     public JwtResponse refresh(@NonNull String refreshToken) throws AuthException{
         if (jwtProvider.validateRefreshToken(refreshToken)){
             final Claims claims = jwtProvider.getRefreshClaims(refreshToken);
@@ -81,8 +112,14 @@ public class AuthService {
         throw new AuthException("unvalid token");
     }
     
-
-   public User getAuthInfo(){
-    return (User) SecurityContextHolder.getContext().getAuthentication();
+    public User getAuthInfo(){
+        return (User) SecurityContextHolder.getContext().getAuthentication();
     } 
+
+    @Override
+    public User loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found " + username));
+        return user;
+    }
 }

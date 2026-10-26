@@ -5,9 +5,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.noname.forum.dto.jwt.JwtRequest;
 import com.noname.forum.dto.jwt.JwtResponse;
 import com.noname.forum.dto.jwt.RefreshJwtRequest;
+import com.noname.forum.dto.user.UserRequestCreate;
+import com.noname.forum.dto.user.UserResponse;
 import com.noname.forum.service.AuthService;
 
 import jakarta.security.auth.message.AuthException;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
@@ -26,6 +29,11 @@ public class AuthController {
     private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
     private final AuthService authService;
+
+    @PostMapping("/register")
+    public ResponseEntity<UserResponse> regester(@RequestBody @Valid  UserRequestCreate userCreateDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(userCreateDTO));
+    }
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> login(@RequestBody JwtRequest authRequest) throws AuthException {
