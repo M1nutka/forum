@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,6 +28,11 @@ import com.noname.forum.dto.post.PostResponse;
 import com.noname.forum.exception.PostNotFoundException;
 import com.noname.forum.repository.PostRepository;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.noname.forum.fixture.PostFixture;
 import com.noname.forum.fixture.PostRequestFixture;
 @ExtendWith (MockitoExtension.class)
@@ -38,6 +44,8 @@ public class PostServiceTest {
     @InjectMocks  
     private PostService postService;
 
+    private Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+
     @Test
     void getAllPostsTest() throws Exception{
         List<Post> posts = new ArrayList<>();
@@ -47,7 +55,6 @@ public class PostServiceTest {
         when(postRepository.findAllPosts()).thenReturn(posts);
 
         List<PostResponse> result = postService.getAllPosts();
-
         assertNotNull(result);
         assertEquals(2, result.size());
         assertEquals(1L, result.get(0).id());
@@ -66,7 +73,6 @@ public class PostServiceTest {
         when(postRepository.findPostId(postId)).thenReturn(Optional.of(post));
 
         PostResponse result = postService.getPost(postId);
-
         assertNotNull(result);
         assertEquals(1L, result.id());
         assertEquals("NiAl", result.author().username());
@@ -89,6 +95,16 @@ public class PostServiceTest {
         verifyNoMoreInteractions(postRepository);
     }
 
+    @Test 
+    void shouldHavaValidationRequest() throws Exception{
+        PostRequest postRequest = PostRequestFixture.incorrectPost();
+
+        Set<ConstraintViolation<PostRequest>> violations = validator.validate(postRequest);
+
+        assertThat(violations).isNotEmpty();
+        assertThat(violations).hasSize(2);
+    }
+
     @Test
     void createPostTest() throws Exception{
         Long userId = 1L;
@@ -98,7 +114,6 @@ public class PostServiceTest {
         when(postRepository.createPost(any(Post.class))).thenReturn(post);
 
         PostResponse result = postService.createPost(postDTO, userId);
-
         assertNotNull(result);
         assertEquals(1L, result.id());
         assertEquals("NiAl", result.author().username());
@@ -117,14 +132,26 @@ public class PostServiceTest {
         when(postRepository.findPostId(postId)).thenReturn(Optional.of(post));
 
         PostResponse result = postService.updatePost(postDTO, postId, userId);
-
         assertNotNull(result);
         assertEquals(1L, result.id());
         assertEquals("NiAl", result.author().username());
 
         verify(postRepository, times(1)).isAuthorPost(postId);
         verify(postRepository, times(2)).findPostId(postId);
+    }
 
+    @Test
+    void shouldThrowWhenAnotherPostUpdateTest() throws Exception{
+        Long userId = 1L;
+        Long postId = 999L;
+        PostRequest postRequest = PostRequestFixture.defaultPost();         
+
+        when(postRepository.findPostId(postId)).thenReturn(Optional.empty());
+
+        assertThrows(PostNotFoundException.class,
+            () -> postService.updatePost(postRequest, postId, userId));
+
+        verify(postRepository, never()).updatePost(any(Post.class));
     }
 
     @Test
@@ -159,6 +186,19 @@ public class PostServiceTest {
 
         verify(postRepository, times(1)).isAuthorPost(postId);
         verify(postRepository, times(1)).deletePost(any(Post.class));
+    }
+
+    @Test
+    void shouldThrowWhenAnotherPostTest() throws Exception{
+        Long userId = 1L;
+        Long postId = 999L;        
+
+        when(postRepository.findPostId(postId)).thenReturn(Optional.empty());
+
+        assertThrows(PostNotFoundException.class,
+            () -> postService.deletePost(postId, userId));
+
+        verify(postRepository, never()).deletePost(any(Post.class));
     }
 
     @Test

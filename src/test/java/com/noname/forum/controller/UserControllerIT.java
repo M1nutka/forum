@@ -28,7 +28,7 @@ import com.noname.forum.dto.user.UserRequestUpdate;
 import com.noname.forum.dto.user.UserResponse;
 import com.noname.forum.repository.UserRepository;
 import com.noname.forum.security.provider.JwtProvider;
-import com.noname.forum.service.SecurityService;
+import com.noname.forum.service.AuthService;
 
 import com.noname.forum.fixture.JwtRequestFixture;
 import com.noname.forum.fixture.UserRequestCreateFixture;
@@ -42,7 +42,7 @@ public class UserControllerIT extends AbstractPostgresIT{
 
     @Autowired private MockMvc mockMvc;
     @Autowired private UserRepository userRepository;
-    @Autowired private SecurityService securityService;
+    @Autowired private AuthService authService;
     @Autowired private JwtProvider jwtProvider;
 
     private ObjectMapper objectMapper;
@@ -61,18 +61,18 @@ public class UserControllerIT extends AbstractPostgresIT{
         this.objectMapper.registerModule(new JavaTimeModule());
 
         UserRequestCreate userRequestCreate = UserRequestCreateFixture.defaultRequestCreate();
-        UserRequestCreate userRequestCreate2 = UserRequestCreateFixture.defaultRequestCreate2();
-        userResponse = securityService.register(userRequestCreate);
-        securityService.register(userRequestCreate2);
+        userResponse = authService.register(userRequestCreate);
 
         UserCredentials userCredentials = new UserCredentials(
             userResponse.id(), userResponse.username(), userRequestCreate.password());
-
         accessToken = jwtProvider.generateAccessToken(userCredentials);
     }
 
     @Test 
-    void getAllUserIT() throws Exception{
+    void getAllIT() throws Exception{
+        UserRequestCreate userRequestCreate2 = UserRequestCreateFixture.defaultRequestCreate2();
+        authService.register(userRequestCreate2);
+
         mockMvc.perform(get("/users")
                 .header("Authorization", "Bearer " + accessToken))
             .andExpect(status().isOk())
@@ -82,8 +82,7 @@ public class UserControllerIT extends AbstractPostgresIT{
     }
 
     @Test 
-    void getUserIT() throws Exception{
-
+    void getIT() throws Exception{
         mockMvc.perform(get("/users/{id}", userResponse.id())
                 .header("Authorization", "Bearer " + accessToken))
             .andExpect(status().isOk())
@@ -101,6 +100,15 @@ public class UserControllerIT extends AbstractPostgresIT{
     }
 
     @Test 
+    void getUserByUsernameIT() throws Exception{
+        mockMvc.perform(get("/users/username/{username}", userResponse.username())
+                .header("Authorization", "Bearer " + accessToken))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.username").value("ogurchikRick"))
+            .andReturn();
+    }
+
+    @Test 
     void whenyUsernameDoesNotExistIT() throws Exception {
         UserResponse user = UserResponseFixture.defaultUser();
         
@@ -110,14 +118,25 @@ public class UserControllerIT extends AbstractPostgresIT{
     }
 
     @Test 
-    void shouldCreateAndRetriveUserIT() throws Exception{
-        UserRequestCreate userRequestCreate = UserRequestCreateFixture.defaultRequestCreate3();
+    void incorrectDataCreateIT() throws Exception{
+        UserRequestCreate incorrectRequest = UserRequestCreateFixture.incorrectRequestCreate();
 
-        MvcResult result = mockMvc.perform(post("/register")
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(incorrectRequest)))
+            .andExpect(status().isBadRequest())
+            .andReturn();
+    }
+
+    @Test 
+    void shouldCreateAndRetriveIT() throws Exception{
+        UserRequestCreate userRequestCreate = UserRequestCreateFixture.defaultRequestCreate2();
+
+        MvcResult result = mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userRequestCreate)))
             .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.name").value("Yogo"))
+            .andExpect(jsonPath("$.name").value("Morty"))
             .andExpect(jsonPath("$.password").doesNotExist())
             .andReturn();
 
@@ -137,13 +156,13 @@ public class UserControllerIT extends AbstractPostgresIT{
         mockMvc.perform(get("/users/{id}", userId)
             .header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Yogo"))
+                .andExpect(jsonPath("$.name").value("Morty"))
                 .andExpect(jsonPath("$.password").doesNotExist())
                 .andReturn();
     }
 
     @Test 
-    void updateUserIT() throws Exception{
+    void updateIT() throws Exception{
         UserRequestUpdate userRequestUpdate = UserRequestUpdateFixture.defaultRequestUpdate();
 
         mockMvc.perform(put("/users")
@@ -156,7 +175,19 @@ public class UserControllerIT extends AbstractPostgresIT{
     }
 
     @Test 
-    void deleteUserIT() throws Exception{
+    void incorrectDataUpdateIT() throws Exception{
+        UserRequestUpdate incorrectRequest = UserRequestUpdateFixture.incorrectRequest();
+
+        mockMvc.perform(put("/users")
+                .header("Authorization", "Bearer " + accessToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(incorrectRequest)))
+            .andExpect(status().isBadRequest())
+            .andReturn();
+    }
+
+    @Test 
+    void deleteIT() throws Exception{
         mockMvc.perform(delete("/users")
                 .header("Authorization", "Bearer " + accessToken))
             .andExpect(status().isOk())

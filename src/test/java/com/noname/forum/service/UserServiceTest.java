@@ -100,6 +100,19 @@ public class UserServiceTest {
     }
 
     @Test 
+    void shouldThrowWhenAnotherUserUpdateTest() throws Exception {
+        User user = UserFixture.defaultUser();
+        UserRequestUpdate updateDTO = UserRequestUpdateFixture.defaultRequestUpdate();
+
+        when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
+    
+        assertThrows(
+            UserNotFoundException.class,
+            () -> userService.updateUser(user.getId(), updateDTO)
+        );
+    }
+
+    @Test 
     void deleteUserTest() throws Exception {
         Long userId = 1L;            
         

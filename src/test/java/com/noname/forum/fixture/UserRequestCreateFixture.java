@@ -23,4 +23,9 @@ public class UserRequestCreateFixture {
             "Yogo", "neiro", LocalDate.of(2001, 12, 21),
             "+78881297799", "qwerty", "I am AI");
     }
+
+    public static UserRequestCreate incorrectRequestCreate() {
+        return new UserRequestCreate("wq", "sdfdsf", null,
+            null, null, null, null, null);
+    }
 }
