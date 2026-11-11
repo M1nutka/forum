@@ -19,9 +19,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.noname.forum.domain.User;
 import com.noname.forum.dto.user.UserRequestUpdate;
 import com.noname.forum.dto.user.UserResponse;
+import com.noname.forum.entity.User;
 import com.noname.forum.exception.UserNotFoundException;
 import com.noname.forum.repository.UserRepository;
 

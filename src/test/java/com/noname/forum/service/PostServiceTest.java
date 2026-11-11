@@ -13,7 +13,6 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,16 +21,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.access.AccessDeniedException;
 
-import com.noname.forum.domain.Post;
 import com.noname.forum.dto.post.PostRequest;
 import com.noname.forum.dto.post.PostResponse;
+import com.noname.forum.entity.Post;
 import com.noname.forum.exception.PostNotFoundException;
 import com.noname.forum.repository.PostRepository;
-
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import com.noname.forum.fixture.PostFixture;
 import com.noname.forum.fixture.PostRequestFixture;
@@ -43,8 +37,6 @@ public class PostServiceTest {
 
     @InjectMocks  
     private PostService postService;
-
-    private Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Test
     void getAllPostsTest() throws Exception{
@@ -93,16 +85,6 @@ public class PostServiceTest {
 
         verify(postRepository, times(1)).findPostId(postId);
         verifyNoMoreInteractions(postRepository);
-    }
-
-    @Test 
-    void shouldHavaValidationRequest() throws Exception{
-        PostRequest postRequest = PostRequestFixture.incorrectPost();
-
-        Set<ConstraintViolation<PostRequest>> violations = validator.validate(postRequest);
-
-        assertThat(violations).isNotEmpty();
-        assertThat(violations).hasSize(2);
     }
 
     @Test

@@ -21,7 +21,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.noname.forum.dto.post.PostResponse;
 import com.noname.forum.fixture.PostResponseFixture;
-import com.noname.forum.service.PostService;
+import com.noname.forum.service.PostService;;
 
 @ExtendWith (MockitoExtension.class)
 public class PostControllerTest {

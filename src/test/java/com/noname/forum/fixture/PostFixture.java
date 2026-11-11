@@ -2,7 +2,7 @@ package com.noname.forum.fixture;
 
 import java.time.LocalDateTime;
 
-import com.noname.forum.domain.Post;
+import com.noname.forum.entity.Post;
 
 public class PostFixture {
     

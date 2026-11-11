@@ -25,6 +25,23 @@ public class UserResponseFixture {
         return user;
     }
 
+    public static UserResponse defaultUser2(){
+        UserResponse user = new UserResponse(
+            3L,
+            "ogurchikRick",
+            "ogurchik@gmail.com",
+            "Rick",
+            "Sanches",
+            LocalDate.of(1988, 12, 21),
+            "+78889997766",
+            true,
+            "I am Ogurchik Rick",
+            UserRoleFixture.usersRoles()
+        );
+        
+        return user;
+    }
+
     public static UserResponse defaultAdmin(){
         UserResponse user = new UserResponse(
             2L,

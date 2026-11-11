@@ -2,7 +2,7 @@ package com.noname.forum.fixture;
 
 import java.time.LocalDate;
 
-import com.noname.forum.domain.User;
+import com.noname.forum.entity.User;
 
 public class UserFixture {
 

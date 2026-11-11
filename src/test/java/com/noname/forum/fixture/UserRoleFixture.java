@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Set;
 
-import com.noname.forum.domain.UserRole;
+import com.noname.forum.entity.UserRole;
 
 public final class UserRoleFixture {
 
