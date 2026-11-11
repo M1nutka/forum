@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import com.noname.forum.controller.AuthController;
 import com.noname.forum.dto.error.ErrorResponse;
 import com.noname.forum.exception.PostNotFoundException;
+import com.noname.forum.exception.RoleNotFoundException;
+import com.noname.forum.exception.UncorrectPasswordException;
+import com.noname.forum.exception.UnvalidTokenException;
 import com.noname.forum.exception.UserNotFoundException;
 
 @ControllerAdvice 
@@ -24,10 +27,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler (Exception.class)
     public ResponseEntity<ErrorResponse> handlerAuth(Exception ex){
         
-        log.error("Handle exeption, " + ex.getMessage());
+        log.error("Exception, " + ex.getMessage());
 
         ErrorResponse response = new ErrorResponse(
-            "exeption",
+            "exception",
             ex.getMessage(),
             LocalDateTime.now()
         );
@@ -38,10 +41,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler (PostNotFoundException.class)
     public ResponseEntity<ErrorResponse> handlerPostNotFound(PostNotFoundException ex){
-        log.error("PostNotFound exeption, " + ex.getMessage());
+        log.error("Post not found, " + ex.getMessage());
 
         ErrorResponse response = new ErrorResponse(
-            "Post not found",
+            "post_not_found",
             ex.getMessage(),
             LocalDateTime.now()
         );
@@ -51,15 +54,54 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler (UserNotFoundException.class)
     public ResponseEntity<ErrorResponse> handlerUserNotFound(UserNotFoundException ex){
-        log.error("UserNotFound exeption, " + ex.getMessage());
+        log.error("User not found, " + ex.getMessage());
 
         ErrorResponse response = new ErrorResponse(
-            "User not found",
+            "user_not_found",
             ex.getMessage(),
             LocalDateTime.now()
         );
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    } 
+
+    @ExceptionHandler (RoleNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handlerRoleNotFound(RoleNotFoundException ex){
+        log.error("Role not found in DB. Check Flyway migrations. " + ex.getMessage());
+
+        ErrorResponse response = new ErrorResponse(
+            "role_not_found",
+            ex.getMessage(),
+            LocalDateTime.now()
+        );
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    } 
+
+    @ExceptionHandler (UncorrectPasswordException.class)
+    public ResponseEntity<ErrorResponse> handlerUncorrectPassword(UncorrectPasswordException ex){
+        log.error("Uncorrect password " + ex.getMessage());
+
+        ErrorResponse response = new ErrorResponse(
+            "uncorrect_password",
+            ex.getMessage(),
+            LocalDateTime.now()
+        );
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    } 
+
+    @ExceptionHandler (UnvalidTokenException.class)
+    public ResponseEntity<ErrorResponse> handlerUnvalidToken(UnvalidTokenException ex){
+        log.error("Unvalid token " + ex.getMessage());
+
+        ErrorResponse response = new ErrorResponse(
+            "unvalid_token",
+            ex.getMessage(),
+            LocalDateTime.now()
+        );
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     } 
 
     @ExceptionHandler (MethodArgumentNotValidException.class)
@@ -69,10 +111,10 @@ public class GlobalExceptionHandler {
             .map(error -> error.getField() + ": " + error.getDefaultMessage())
             .collect(Collectors.joining("; "));
 
-        log.error("UserNotFound exeption, " + errorMessage);
+        log.error("Argument not valid, " + errorMessage);
 
         ErrorResponse response = new ErrorResponse(
-            "Argument not valid",
+            "argument_not_valid",
             errorMessage,
             LocalDateTime.now()
         );
