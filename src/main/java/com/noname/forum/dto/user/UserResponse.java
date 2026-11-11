@@ -3,8 +3,8 @@ package com.noname.forum.dto.user;
 import java.time.LocalDate;
 import java.util.Set;
 
-import com.noname.forum.domain.User;
-import com.noname.forum.domain.UserRole;
+import com.noname.forum.entity.User;
+import com.noname.forum.entity.UserRole;
 
 public record UserResponse(
     Long id,

@@ -8,8 +8,8 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import com.noname.forum.domain.Post;
-import com.noname.forum.map.PostRowMapper;
+import com.noname.forum.entity.Post;
+import com.noname.forum.repository.mapper.PostRowMapper;
 
 import lombok.RequiredArgsConstructor;
 

@@ -2,7 +2,7 @@ package com.noname.forum.dto.post;
 
 import java.time.LocalDateTime;
 
-import com.noname.forum.domain.Post;
+import com.noname.forum.entity.Post;
  
 public record PostResponse(
     Long id,

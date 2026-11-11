@@ -1,4 +1,4 @@
-package com.noname.forum.domain;
+package com.noname.forum.entity;
 
 
 import java.time.LocalDate;

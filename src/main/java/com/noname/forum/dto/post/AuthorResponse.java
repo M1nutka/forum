@@ -1,6 +1,6 @@
 package com.noname.forum.dto.post;
 
-import com.noname.forum.domain.User;
+import com.noname.forum.entity.User;
 
 public record AuthorResponse(
     Long id,

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.noname.forum.domain.User;
+import com.noname.forum.entity.User;
 import com.noname.forum.security.provider.JwtProvider;
 import com.noname.forum.service.UserService;
 
