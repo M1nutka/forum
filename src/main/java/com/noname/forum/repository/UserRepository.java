@@ -1,21 +1,26 @@
 package com.noname.forum.repository;
 
+import com.noname.forum.repository.mapper.RoleMapExtractor;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
+import java.util.stream.Collectors;
 
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import com.noname.forum.domain.User;
-import com.noname.forum.domain.UserRole;
 import com.noname.forum.dto.user.UserCredentials;
-import com.noname.forum.extractor.UserListExtractor;
-import com.noname.forum.map.UserCredentialsRowMapper;
-import com.noname.forum.map.UserRowMapper;
+import com.noname.forum.entity.User;
+import com.noname.forum.entity.UserRole;
+import com.noname.forum.repository.mapper.UserCredentialsRowMapper;
+import com.noname.forum.repository.mapper.UserListExtractor;
+import com.noname.forum.repository.mapper.UserRowMapper;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +30,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor  
 public class UserRepository {
 
+    private final RoleMapExtractor roleMapExtractor;
+
     private final JdbcTemplate jdbcTemplate;
+
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     private final UserRowMapper userRowMapper;
 
@@ -93,6 +102,8 @@ public class UserRepository {
     private static final String DELETE_ALL = "DELETE FROM users";
     private static final String DELETE_ALL_USERROLES = "DELETE FROM userroles";
     private static final String DELETE_ALL_POSTS = "DELETE FROM posts";
+
+    private static final String SELECT_ROLE_ID = "SELECT id, role FROM roles WHERE role IN (:names)";
      
     public List<User> findAll(){
         return jdbcTemplate.query(SELECT_ALL, userListExtractor);
@@ -143,8 +154,12 @@ public class UserRepository {
         return user;
     }
 
-    public void assignRoles(Long userId, Long roleId){
-        jdbcTemplate.update(INSERT_USER_ROLE, userId, roleId);
+    public void assignRolesBatch(Long userId, Collection<Long> roleIds){
+
+        List<Object[]> batchArgs = roleIds.stream()
+            .map(roleId -> new Object[]{userId, roleId})
+            .collect(Collectors.toList());
+        jdbcTemplate.batchUpdate(INSERT_USER_ROLE, batchArgs);
     }
 
     public Optional<Long> findRoleIdByName(String roleName) {
@@ -165,6 +180,11 @@ public class UserRepository {
         jdbcTemplate.update(DELETE_ALL_USERROLES);
         jdbcTemplate.update(DELETE_ALL_POSTS);
         jdbcTemplate.update(DELETE_ALL);
+    }
+
+    public Map<String, Long> findRoleIdsByNames(Collection<String> rolesName){
+        MapSqlParameterSource params = new MapSqlParameterSource("names", rolesName);
+        return namedParameterJdbcTemplate.query(SELECT_ROLE_ID, params, roleMapExtractor);
     }
 }
 

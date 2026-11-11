@@ -6,9 +6,9 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.noname.forum.domain.User;
 import com.noname.forum.dto.user.UserRequestUpdate;
 import com.noname.forum.dto.user.UserResponse;
+import com.noname.forum.entity.User;
 import com.noname.forum.exception.UserNotFoundException;
 import com.noname.forum.repository.UserRepository;
 
@@ -30,14 +30,14 @@ public class UserService {
     public UserResponse getUserById(Long id){
         return userRepository.findById(id)
             .map(UserResponse::from)
-            .orElseThrow(() -> new UserNotFoundException(String.valueOf(id)));
+            .orElseThrow(() -> new UserNotFoundException(id));
     }
 
     @Transactional 
     public UserResponse updateUser(Long id, UserRequestUpdate updateRequest){
         Optional<User> userFound = userRepository.findById(id);
         if (userFound.isEmpty()){
-            throw new  UserNotFoundException(String.valueOf(id));
+            throw new  UserNotFoundException(id);
         }
         User user = new User();
         user.setId(id);

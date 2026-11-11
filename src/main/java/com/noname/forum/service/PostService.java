@@ -1,16 +1,17 @@
 package com.noname.forum.service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.noname.forum.domain.Post;
-import com.noname.forum.domain.User;
 import com.noname.forum.dto.post.PostRequest;
 import com.noname.forum.dto.post.PostResponse;
+import com.noname.forum.entity.Post;
+import com.noname.forum.entity.User;
 import com.noname.forum.exception.PostNotFoundException;
 import com.noname.forum.repository.PostRepository;
 
@@ -53,7 +54,7 @@ public class PostService {
             throw new PostNotFoundException("Post not found where id = " + id);
         }
 
-        if (postRepository.isAuthorPost(id) != userId) {
+        if (!Objects.equals(postRepository.isAuthorPost(id),userId)) {
             throw new AccessDeniedException("User is not author post");
         }
 
