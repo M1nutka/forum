@@ -26,7 +26,6 @@ import com.noname.forum.dto.post.PostResponse;
 import com.noname.forum.entity.Post;
 import com.noname.forum.exception.PostNotFoundException;
 import com.noname.forum.repository.PostRepository;
-
 import com.noname.forum.fixture.PostFixture;
 import com.noname.forum.fixture.PostRequestFixture;
 @ExtendWith (MockitoExtension.class)
@@ -46,7 +45,7 @@ public class PostServiceTest {
 
         when(postRepository.findAllPosts()).thenReturn(posts);
 
-        List<PostResponse> result = postService.getAllPosts();
+        List<PostResponse> result = postService.getAll();
         assertNotNull(result);
         assertEquals(2, result.size());
         assertEquals(1L, result.get(0).id());
@@ -64,7 +63,7 @@ public class PostServiceTest {
 
         when(postRepository.findPostId(postId)).thenReturn(Optional.of(post));
 
-        PostResponse result = postService.getPost(postId);
+        PostResponse result = postService.get(postId);
         assertNotNull(result);
         assertEquals(1L, result.id());
         assertEquals("NiAl", result.author().username());
@@ -80,7 +79,7 @@ public class PostServiceTest {
 
         assertThrows(
             PostNotFoundException.class,
-            () -> postService.getPost(postId)
+            () -> postService.get(postId)
         );
 
         verify(postRepository, times(1)).findPostId(postId);
@@ -95,7 +94,7 @@ public class PostServiceTest {
 
         when(postRepository.createPost(any(Post.class))).thenReturn(post);
 
-        PostResponse result = postService.createPost(postDTO, userId);
+        PostResponse result = postService.create(postDTO, userId);
         assertNotNull(result);
         assertEquals(1L, result.id());
         assertEquals("NiAl", result.author().username());
@@ -113,7 +112,7 @@ public class PostServiceTest {
         when(postRepository.isAuthorPost(postId)).thenReturn(userId);
         when(postRepository.findPostId(postId)).thenReturn(Optional.of(post));
 
-        PostResponse result = postService.updatePost(postDTO, postId, userId);
+        PostResponse result = postService.update(postDTO, postId, userId);
         assertNotNull(result);
         assertEquals(1L, result.id());
         assertEquals("NiAl", result.author().username());
@@ -131,7 +130,7 @@ public class PostServiceTest {
         when(postRepository.findPostId(postId)).thenReturn(Optional.empty());
 
         assertThrows(PostNotFoundException.class,
-            () -> postService.updatePost(postRequest, postId, userId));
+            () -> postService.update(postRequest, postId, userId));
 
         verify(postRepository, never()).updatePost(any(Post.class));
     }
@@ -148,7 +147,7 @@ public class PostServiceTest {
 
         assertThrows(
             AccessDeniedException.class,
-            () -> postService.updatePost(postDTO, postId, userId)
+            () -> postService.update(postDTO, postId, userId)
         );
 
         verify(postRepository, times(1)).isAuthorPost(postId);
@@ -164,7 +163,7 @@ public class PostServiceTest {
         when(postRepository.isAuthorPost(postId)).thenReturn(userId);
         when(postRepository.findPostId(postId)).thenReturn(Optional.of(post));
 
-        postService.deletePost(postId, userId);
+        postService.delete(postId, userId);
 
         verify(postRepository, times(1)).isAuthorPost(postId);
         verify(postRepository, times(1)).deletePost(any(Post.class));
@@ -178,7 +177,7 @@ public class PostServiceTest {
         when(postRepository.findPostId(postId)).thenReturn(Optional.empty());
 
         assertThrows(PostNotFoundException.class,
-            () -> postService.deletePost(postId, userId));
+            () -> postService.delete(postId, userId));
 
         verify(postRepository, never()).deletePost(any(Post.class));
     }
@@ -193,7 +192,7 @@ public class PostServiceTest {
         when(postRepository.findPostId(postId)).thenReturn(Optional.of(post));
 
         assertThrows(AccessDeniedException.class,
-            () -> postService.deletePost(postId, userId));
+            () -> postService.delete(postId, userId));
 
         verify(postRepository, times(1)).isAuthorPost(postId);
         verify(postRepository, never()).deletePost(any(Post.class));

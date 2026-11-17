@@ -1,0 +1,5 @@
+ALTER TABLE userroles
+    ALTER COLUMN user_id TYPE BIGINT,
+    ALTER COLUMN role_id TYPE BIGINT;
+
+DROP TABLE likes;

@@ -28,7 +28,6 @@ import com.noname.forum.repository.UserRepository;
 import com.noname.forum.security.provider.JwtProvider;
 import com.noname.forum.service.AuthService;
 import com.noname.forum.service.PostService;
-
 import com.noname.forum.db.AbstractPostgresIT;
 import com.noname.forum.fixture.PostRequestFixture;
 import com.noname.forum.fixture.UserRequestCreateFixture;
@@ -71,8 +70,8 @@ public class PostControllerIT extends AbstractPostgresIT{
     void getAllIT() throws Exception{
         PostRequest postRequest = PostRequestFixture.defaultPost();
         PostRequest postRequest2 = PostRequestFixture.defaultPost2();
-        postService.createPost(postRequest, userResponse.id());
-        postService.createPost(postRequest2, userResponse.id());
+        postService.create(postRequest, userResponse.id());
+        postService.create(postRequest2, userResponse.id());
 
         mockMvc.perform(get("/posts")
                 .header("Authorization", "Bearer " + accessToken))
@@ -89,7 +88,7 @@ public class PostControllerIT extends AbstractPostgresIT{
     @Test 
     void getIT() throws Exception{
         PostRequest postRequest = PostRequestFixture.defaultPost();
-        PostResponse postResponse = postService.createPost(postRequest, userResponse.id());
+        PostResponse postResponse = postService.create(postRequest, userResponse.id());
 
         mockMvc.perform(get("/posts/{id}", postResponse.id())
                 .header("Authorization", "Bearer " + accessToken))
@@ -134,7 +133,7 @@ public class PostControllerIT extends AbstractPostgresIT{
     @Test 
     void updateIT() throws Exception{
         PostRequest postRequest = PostRequestFixture.defaultPost();
-        PostResponse postResponse = postService.createPost(postRequest, userResponse.id());
+        PostResponse postResponse = postService.create(postRequest, userResponse.id());
 
         mockMvc.perform(put("/posts/{id}", postResponse.id())
                 .header("Authorization", "Bearer " + accessToken)
@@ -149,7 +148,7 @@ public class PostControllerIT extends AbstractPostgresIT{
     @Test 
     void IncorrectDataUpdateIT() throws Exception{
         PostRequest postRequest = PostRequestFixture.defaultPost();
-        PostResponse postResponse = postService.createPost(postRequest, userResponse.id());
+        PostResponse postResponse = postService.create(postRequest, userResponse.id());
 
         PostRequest incorrectRequest = PostRequestFixture.incorrectPost();
 
@@ -174,7 +173,7 @@ public class PostControllerIT extends AbstractPostgresIT{
     @Test 
     void deleteIT() throws Exception{
         PostRequest postRequest = PostRequestFixture.defaultPost();
-        PostResponse postResponse = postService.createPost(postRequest, userResponse.id());
+        PostResponse postResponse = postService.create(postRequest, userResponse.id());
 
         mockMvc.perform(delete("/posts/{id}", postResponse.id())
                 .header("Authorization", "Bearer " + accessToken))

@@ -20,21 +20,21 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public List<UserResponse> getAllUser(){
+    public List<UserResponse> getAll(){
         
         return userRepository.findAll().stream()
             .map(UserResponse::from)
             .toList();
     }
 
-    public UserResponse getUserById(Long id){
+    public UserResponse get(Long id){
         return userRepository.findById(id)
             .map(UserResponse::from)
             .orElseThrow(() -> new UserNotFoundException(id));
     }
 
     @Transactional 
-    public UserResponse updateUser(Long id, UserRequestUpdate updateRequest){
+    public UserResponse update(Long id, UserRequestUpdate updateRequest){
         Optional<User> userFound = userRepository.findById(id);
         if (userFound.isEmpty()){
             throw new  UserNotFoundException(id);
@@ -52,18 +52,11 @@ public class UserService {
         return UserResponse.from(user);
     }
 
-    public void deleteUser(Long userId){
+    public void delete(Long userId){
         userRepository.delete(userId);
     } 
 
     public Optional<User> getByUsername(String username) {
         return userRepository.findByUsername(username);
     }
-
-    public UserResponse getByUsernameForResponse(String username) {
-        return userRepository.findByUsername(username)
-            .map(UserResponse::from)
-            .orElseThrow(() -> new UserNotFoundException(username));
-    }
-
 }

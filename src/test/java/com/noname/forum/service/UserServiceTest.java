@@ -24,7 +24,6 @@ import com.noname.forum.dto.user.UserResponse;
 import com.noname.forum.entity.User;
 import com.noname.forum.exception.UserNotFoundException;
 import com.noname.forum.repository.UserRepository;
-
 import com.noname.forum.fixture.UserFixture;
 import com.noname.forum.fixture.UserRequestUpdateFixture;
 
@@ -44,7 +43,7 @@ public class UserServiceTest {
 
         when(userRepository.findAll()).thenReturn(users);
 
-        List<UserResponse> result = userService.getAllUser();
+        List<UserResponse> result = userService.getAll();
         assertNotNull(result);
         assertEquals(2, result.size());
         assertEquals(1L, result.get(0).id());
@@ -61,7 +60,7 @@ public class UserServiceTest {
             
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
-        UserResponse result = userService.getUserById(user.getId());
+        UserResponse result = userService.get(user.getId());
         assertNotNull(result);
         assertEquals(1L, result.id());
         assertEquals("NiAl", result.username());
@@ -76,7 +75,7 @@ public class UserServiceTest {
         when(userRepository.findById(user.getId())).thenReturn(Optional.empty());
         assertThrows(
             UserNotFoundException.class,
-            () -> userService.getUserById(user.getId())
+            () -> userService.get(user.getId())
         );
 
         verify(userRepository, times(1)).findById(user.getId());
@@ -91,7 +90,7 @@ public class UserServiceTest {
 
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
     
-        UserResponse result = userService.updateUser(user.getId(), updateDTO);
+        UserResponse result = userService.update(user.getId(), updateDTO);
         assertNotNull(result);
         assertEquals(1L, result.id());
         assertEquals("Nill", result.name());
@@ -108,7 +107,7 @@ public class UserServiceTest {
     
         assertThrows(
             UserNotFoundException.class,
-            () -> userService.updateUser(user.getId(), updateDTO)
+            () -> userService.update(user.getId(), updateDTO)
         );
     }
 
@@ -116,7 +115,7 @@ public class UserServiceTest {
     void deleteUserTest() throws Exception {
         Long userId = 1L;            
         
-        userService.deleteUser(userId);
+        userService.delete(userId);
 
         verify(userRepository, times(1)).delete(userId);
     }

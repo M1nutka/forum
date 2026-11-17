@@ -26,48 +26,47 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController
 @RequiredArgsConstructor 
 @RequestMapping("/users")
-public class UserController {
+public class UserController implements UserApi{
 
     private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
     private final UserService userService;
 
+    @Override
     @PreAuthorize("isAuthenticated()")
     @GetMapping
-    public ResponseEntity<List<UserResponse>> getAllUser() {
+    public ResponseEntity<List<UserResponse>> getAll() {
         log.info("Get all users");
-        return ResponseEntity.status(HttpStatus.OK).body(userService.getAllUser());
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getAll());
     }
 
+    @Override
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getUser(@PathVariable Long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserById(id));
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/username/{username}")
-    public ResponseEntity<UserResponse> getUserByUsername(@PathVariable String username) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.getByUsernameForResponse(username));
+    public ResponseEntity<UserResponse> get(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.get(id));
     }
     
+    @Override
     @PreAuthorize("isAuthenticated()")
     @PutMapping
-    public ResponseEntity<UserResponse> userUpdate(@AuthenticationPrincipal Long userId, @RequestBody @Valid  UserRequestUpdate updateDTO) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(userId, updateDTO));
+    public ResponseEntity<UserResponse> update(@AuthenticationPrincipal Long userId, @RequestBody @Valid  UserRequestUpdate updateDTO) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.update(userId, updateDTO));
     }
     
+    @Override
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping
-    public ResponseEntity<?> userRemove(@AuthenticationPrincipal Long userId){
-        userService.deleteUser(userId);
+    public ResponseEntity<?> remove(@AuthenticationPrincipal Long userId){
+        userService.delete(userId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
+    @Override
     @PreAuthorize("hasRole('ADMIN')") 
     @DeleteMapping("/admin/{id}")
-    public ResponseEntity<?> userRemoveAdmin(@PathVariable Long userId){
-        userService.deleteUser(userId);
+    public ResponseEntity<?> removeAdmin(@PathVariable Long userId){
+        userService.delete(userId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

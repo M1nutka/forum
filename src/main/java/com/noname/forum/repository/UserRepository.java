@@ -84,10 +84,6 @@ public class UserRepository {
                 VALUES (?, ?)
                 """;
 
-    private static final String SELECT_ROLE_ID_BY_NAME = """
-            SELECT id from roles WHERE role = ?
-            """;
-
     private static final String UPDATE = """
                 UPDATE users
                 SET name = ?, email = ?, lastname = ?, born_is = ?, phone = ?, description = ?
@@ -162,13 +158,8 @@ public class UserRepository {
         jdbcTemplate.batchUpdate(INSERT_USER_ROLE, batchArgs);
     }
 
-    public Optional<Long> findRoleIdByName(String roleName) {
-        return jdbcTemplate.queryForList(SELECT_ROLE_ID_BY_NAME, Long.class, roleName
-        ).stream().findFirst();
-    }
-
     public void update(User user){
-        jdbcTemplate.update(UPDATE, user.getLastname(), user.getEmail(), user.getLastname(), 
+        jdbcTemplate.update(UPDATE, user.getName(), user.getEmail(), user.getLastname(), 
             user.getBornIs(), user.getPhone(),user.getDescription(), user.getId());
     }
 

@@ -28,46 +28,51 @@ import org.springframework.web.bind.annotation.PutMapping;
 @RestController 
 @RequestMapping("/posts")
 @RequiredArgsConstructor 
-public class PostController {
+public class PostController implements PostApi{
 
     private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
 
     private final PostService postService;
 
+    @Override
     @PreAuthorize("isAuthenticated()")
     @GetMapping
-    public ResponseEntity<List<PostResponse>> getAllPosts() {
+    public ResponseEntity<List<PostResponse>> getAll() {
         log.info("Get all posts");
-        return ResponseEntity.status(HttpStatus.OK).body(postService.getAllPosts());
+        return ResponseEntity.status(HttpStatus.OK).body(postService.getAll());
     }
 
+    @Override
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
-    public ResponseEntity<PostResponse> getPost(@PathVariable Long id) {
+    public ResponseEntity<PostResponse> get(@PathVariable Long id) {
         log.info("Get post id = " + id);
-        return ResponseEntity.status(HttpStatus.OK).body(postService.getPost(id));
+        return ResponseEntity.status(HttpStatus.OK).body(postService.get(id));
     }
 
+    @Override
     @PreAuthorize("isAuthenticated()")
     @PostMapping()
-    public ResponseEntity<PostResponse> createPost(@RequestBody @Valid  PostRequest request, @AuthenticationPrincipal Long id) {
+    public ResponseEntity<PostResponse> create(@RequestBody @Valid  PostRequest request, @AuthenticationPrincipal Long id) {
         log.info("Create post");
-        return ResponseEntity.status(HttpStatus.CREATED).body(postService.createPost(request, id));
+        return ResponseEntity.status(HttpStatus.CREATED).body(postService.create(request, id));
     }
 
+    @Override
     @PreAuthorize("isAuthenticated()")
     @PutMapping("/{id}")
-    public ResponseEntity<PostResponse> putPost(@PathVariable Long id, @AuthenticationPrincipal Long userId,  @RequestBody @Valid  PostRequest request){
+    public ResponseEntity<PostResponse> put(@PathVariable Long id, @AuthenticationPrincipal Long userId,  @RequestBody @Valid  PostRequest request){
         log.info("Change post info id = " + id + ". UserId = " + userId);
-        return ResponseEntity.status(HttpStatus.OK).body(postService.updatePost(request, id, userId));
+        return ResponseEntity.status(HttpStatus.OK).body(postService.update(request, id, userId));
     }
 
+    @Override
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletePost(@PathVariable Long id, @AuthenticationPrincipal Long userId){
+    public ResponseEntity<?> delete(@PathVariable Long id, @AuthenticationPrincipal Long userId){
         log.info("Delete post id = " + id + ". UserId = " + userId);
-        postService.deletePost(id, userId);
+        postService.delete(id, userId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
     

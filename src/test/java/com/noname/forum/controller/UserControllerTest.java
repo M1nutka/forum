@@ -54,42 +54,28 @@ public class UserControllerTest {
         users.add(UserResponseFixture.defaultUser());
         users.add(UserResponseFixture.defaultAdmin());
 
-        when(userService.getAllUser()).thenReturn(users);
+        when(userService.getAll()).thenReturn(users);
         mockMvc.perform(get("/users"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$[0].id").value(1))
             .andExpect(jsonPath("$[1].id").value(2))
             .andExpect(jsonPath("$[0].username").value("NiAl"))
             .andExpect(jsonPath("$").isArray());
-        verify(userService, times(1)).getAllUser();
+        verify(userService, times(1)).getAll();
     }
 
     @Test 
     void getUserTest() throws Exception {
         UserResponse user = UserResponseFixture.defaultUser();
 
-        when(userService.getUserById(user.id())).thenReturn(user);
+        when(userService.get(user.id())).thenReturn(user);
         
         mockMvc.perform(get("/users/{id}", user.id()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(1))
             .andExpect(jsonPath("$.username").value("NiAl"));
 
-        verify(userService, times(1)).getUserById(user.id());
-    }
-
-    @Test 
-    void getUserByUsernameTest() throws Exception {
-        UserResponse user = UserResponseFixture.defaultUser();
-
-        when(userService.getByUsernameForResponse(user.username())).thenReturn(user);
-        
-        mockMvc.perform(get("/users/username/{username}", user.username()))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(1))
-            .andExpect(jsonPath("$.username").value("NiAl"));
-
-        verify(userService, times(1)).getByUsernameForResponse(user.username());
+        verify(userService, times(1)).get(user.id());
     }
 
 }

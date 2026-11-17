@@ -29,7 +29,6 @@ import com.noname.forum.dto.user.UserResponse;
 import com.noname.forum.repository.UserRepository;
 import com.noname.forum.security.provider.JwtProvider;
 import com.noname.forum.service.AuthService;
-
 import com.noname.forum.fixture.JwtRequestFixture;
 import com.noname.forum.fixture.UserRequestCreateFixture;
 import com.noname.forum.fixture.UserRequestUpdateFixture;
@@ -95,24 +94,6 @@ public class UserControllerIT extends AbstractPostgresIT{
         UserResponse user = UserResponseFixture.defaultUser();
         
         mockMvc.perform(get("/users/{id}", user.id())
-                .header("Authorization", "Bearer " + accessToken))
-            .andExpect(status().isNotFound());
-    }
-
-    @Test 
-    void getUserByUsernameIT() throws Exception{
-        mockMvc.perform(get("/users/username/{username}", userResponse.username())
-                .header("Authorization", "Bearer " + accessToken))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.username").value("ogurchikRick"))
-            .andReturn();
-    }
-
-    @Test 
-    void whenyUsernameDoesNotExistIT() throws Exception {
-        UserResponse user = UserResponseFixture.defaultUser();
-        
-        mockMvc.perform(get("/users/username/{username}", user.username())
                 .header("Authorization", "Bearer " + accessToken))
             .andExpect(status().isNotFound());
     }

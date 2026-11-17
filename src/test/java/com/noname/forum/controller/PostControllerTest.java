@@ -45,7 +45,7 @@ public class PostControllerTest {
         posts.add(PostResponseFixture.defaultPostResponse1());
         posts.add(PostResponseFixture.defaultPostResponse2());
 
-        when(postService.getAllPosts()).thenReturn(posts);
+        when(postService.getAll()).thenReturn(posts);
         
         mockMvc.perform(get("/posts"))
             .andExpect(status().isOk())
@@ -53,20 +53,20 @@ public class PostControllerTest {
             .andExpect(jsonPath("$[1].id").value(2))
             .andExpect(jsonPath("$").isArray());
 
-        verify(postService, times(1)).getAllPosts();
+        verify(postService, times(1)).getAll();
     }
 
     @Test
     void getPostTest() throws Exception{
         PostResponse post = PostResponseFixture.defaultPostResponse1();
 
-        when(postService.getPost(post.id())).thenReturn(post);
+        when(postService.get(post.id())).thenReturn(post);
 
         mockMvc.perform(get("/posts/{id}", post.id()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(1));
 
-        verify(postService, times(1)).getPost(post.id());
+        verify(postService, times(1)).get(post.id());
     }
 
 }

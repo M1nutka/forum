@@ -22,19 +22,19 @@ import lombok.RequiredArgsConstructor;
 public class PostService {
     private final PostRepository postRepository;
 
-    public List<PostResponse> getAllPosts(){
+    public List<PostResponse> getAll(){
         return postRepository.findAllPosts().stream()
             .map(PostResponse::from)
             .toList();
     }
 
-    public PostResponse getPost(Long id){
+    public PostResponse get(Long id){
         return postRepository.findPostId(id)
             .map(PostResponse::from)
             .orElseThrow(() -> new PostNotFoundException(String.valueOf(id)));
     }
 
-    public PostResponse createPost(PostRequest request, Long authorId) {
+    public PostResponse create(PostRequest request, Long authorId) {
         Post postCreate = new Post();
         postCreate.setTitle(request.title());
         postCreate.setDescription(request.description());
@@ -47,7 +47,7 @@ public class PostService {
     }
 
     @Transactional 
-    public PostResponse updatePost(PostRequest request, Long id, Long userId){
+    public PostResponse update(PostRequest request, Long id, Long userId){
 
         Optional<Post> post = postRepository.findPostId(id);
         if (post.isEmpty()) {
@@ -69,7 +69,7 @@ public class PostService {
     }
 
     @Transactional 
-    public void deletePost(Long id, Long userId) {
+    public void delete(Long id, Long userId) {
         Optional<Post> post = postRepository.findPostId(id);
         if (post.isEmpty()) {
             throw new PostNotFoundException("Post not found where id = " + id);

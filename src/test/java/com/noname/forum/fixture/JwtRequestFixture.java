@@ -18,4 +18,11 @@ public class JwtRequestFixture {
                         "qwerty"
                 );
         }
+
+        public static JwtRequest PasswordIncorrectJwtRequest() {
+                return new JwtRequest(
+                        "ogurchikRick",
+                        "123456"
+                );
+        }
 }
